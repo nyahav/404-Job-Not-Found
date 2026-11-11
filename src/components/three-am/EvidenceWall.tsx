@@ -1,6 +1,7 @@
 import { Link2, Plus, Search, Trash2 } from 'lucide-react';
 import type { DragEvent } from 'react';
 import { validateClaim } from './engine';
+import HelpTip from './HelpTip';
 import { scenario } from './scenario';
 import { CLAIM_SLOT_LABELS } from './types';
 import type { Claim, ClaimSlot, Clue, IncidentPhase } from './types';
@@ -45,9 +46,15 @@ export default function EvidenceWall({
       className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/70"
     >
       <header className="flex items-center justify-between gap-2 border-b border-slate-800 px-4 py-3">
-        <h2 className="font-mono text-xs font-semibold tracking-wider text-slate-200">
-          EVIDENCE WALL
-        </h2>
+        <div className="flex items-center gap-1">
+          <h2 className="font-mono text-xs font-semibold tracking-wider text-slate-200">
+            EVIDENCE WALL
+          </h2>
+          <HelpTip label="About building a diagnosis">
+            Connect a trigger, a mechanism, and an effect, then attach clues that support your
+            causal explanation. You can drag clues or use their add buttons.
+          </HelpTip>
+        </div>
         <span className="font-mono text-[10px] text-slate-500">{clues.length} CLUES</span>
       </header>
 

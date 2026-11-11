@@ -3,6 +3,7 @@ import {
   AlarmClock,
   ArrowDown,
   ArrowRight,
+  BookOpen,
   Check,
   CircleHelp,
   Pause,
@@ -11,15 +12,17 @@ import {
   Volume2,
   VolumeX,
 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import ActionPalette from './ActionPalette';
 import { getAvailableClues, resolveActions, validateClaim } from './engine';
 import EvidenceWall from './EvidenceWall';
+import HelpTip from './HelpTip';
 import IncidentDashboard from './IncidentDashboard';
 import PostMortem from './PostMortem';
 import { scenario } from './scenario';
 import TeamChat from './TeamChat';
 import Toolbelt from './Toolbelt';
+import TutorialDialog, { saveTutorialPreference, shouldShowTutorial } from './TutorialDialog';
 import { useIncidentSound } from './useIncidentSound';
 import type {
   ActionResolution,
@@ -72,6 +75,7 @@ export default function ThreeAMApp() {
   const [replayPlaying, setReplayPlaying] = useState(false);
   const [codexUnlocked, setCodexUnlocked] = useState(false);
   const [codexError, setCodexError] = useState('');
+  const [tutorialOpen, setTutorialOpen] = useState(false);
   const {
     enabled: soundEnabled,
     error: soundError,
@@ -268,6 +272,15 @@ export default function ThreeAMApp() {
     navigatePhase('investigate');
   };
 
+  const closeTutorial = useCallback((skipForSession: boolean) => {
+    saveTutorialPreference(skipForSession);
+    setTutorialOpen(false);
+  }, []);
+
+  useEffect(() => {
+    setTutorialOpen(shouldShowTutorial());
+  }, []);
+
   const currentPhaseIndex = phases.findIndex((item) => item.id === phase);
   const recoveryMinutes = resolution && outcome === 'fixed' ? resolution.timeMin + 3 : 20;
 
@@ -284,11 +297,8 @@ export default function ThreeAMApp() {
               <AlarmClock aria-hidden="true" size={23} />
             </span>
             <div>
-              <p className="font-mono text-[10px] tracking-[0.22em] text-amber-300 uppercase">
-                3 AM · INCIDENT RESPONSE LAB
-              </p>
               <h1 className="mt-1 text-3xl font-black tracking-tight text-white sm:text-4xl">
-                Blast Radius
+                3 AM · INCIDENT RESPONSE LAB
               </h1>
               <p className="mt-1 max-w-2xl text-sm text-slate-400">
                 Operate the incident. Find the cause. Keep the blast small.
@@ -296,6 +306,13 @@ export default function ThreeAMApp() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              className="inline-flex items-center gap-2 rounded-lg border border-slate-700 px-3 py-2 text-xs text-slate-300 transition hover:border-cyan-400/40 hover:text-cyan-100"
+              onClick={() => setTutorialOpen(true)}
+              type="button"
+            >
+              <BookOpen aria-hidden="true" size={14} /> How to play
+            </button>
             <span className="hidden font-mono text-[9px] text-slate-600 sm:inline">
               SOUND IS OFF BY DEFAULT
             </span>
@@ -319,6 +336,8 @@ export default function ThreeAMApp() {
           </div>
         </div>
       </header>
+
+      <TutorialDialog onClose={closeTutorial} open={tutorialOpen} />
 
       <main className="mx-auto max-w-[1600px] space-y-5 px-3 py-5 sm:px-6 sm:py-7">
         {soundError && (
@@ -511,7 +530,13 @@ export default function ThreeAMApp() {
                 <p className="font-mono text-[10px] tracking-wider text-amber-200">
                   CHANGE WINDOW · 3 TICKETS
                 </p>
-                <h2 className="mt-2 text-xl font-bold text-white">Choose the blast radius.</h2>
+                <h2 className="mt-2 flex items-center gap-1 text-xl font-bold text-white">
+                  Choose the blast radius.
+                  <HelpTip label="About choosing production changes">
+                    Choose changes that address the root cause, not just the visible symptom. Each
+                    ticket uses part of your limited change budget and can introduce side effects.
+                  </HelpTip>
+                </h2>
                 <p className="mt-2 text-sm leading-6 text-slate-400">
                   The evidence is in. Pick up to three changes, watch for second-order effects, then
                   replay the same traffic in both universes.
@@ -664,7 +689,13 @@ function ReplayControls({
           <p className="font-mono text-[10px] tracking-wider text-cyan-300">
             PARALLEL-UNIVERSE REPLAY
           </p>
-          <h2 className="mt-1 text-lg font-bold text-white">Same traffic. Two outcomes.</h2>
+          <h2 className="mt-1 flex items-center gap-1 text-lg font-bold text-white">
+            Same traffic. Two outcomes.
+            <HelpTip label="About replaying the incident">
+              Replay compares your selected changes against no change and an ideal fix under the
+              same simulated traffic. Play, pause, or step through the recovery.
+            </HelpTip>
+          </h2>
         </div>
         <div className="flex items-center gap-2">
           <button

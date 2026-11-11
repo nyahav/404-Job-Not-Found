@@ -1,4 +1,5 @@
 import { MessageCircle, MessageSquareText, ThumbsDown, ThumbsUp } from 'lucide-react';
+import HelpTip from './HelpTip';
 import { teammates } from './scenario';
 import type { Clue } from './types';
 
@@ -25,8 +26,12 @@ export default function TeamChat({ elapsedSeconds, discoveredClues, responses, o
       className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/70"
     >
       <header className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
-        <h2 className="flex items-center gap-2 font-mono text-xs font-semibold tracking-wider text-slate-200">
+        <h2 className="flex items-center gap-1 font-mono text-xs font-semibold tracking-wider text-slate-200">
           <MessageCircle aria-hidden="true" className="text-cyan-300" size={15} /> TEAM CHAT
+          <HelpTip label="About team chat">
+            Teammates share observations and suggestions as evidence arrives. You decide whether to
+            follow a suggestion, ask for evidence, or ignore it.
+          </HelpTip>
         </h2>
         <span className="font-mono text-[9px] text-slate-600">#incident-checkout</span>
       </header>

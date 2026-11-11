@@ -1,6 +1,7 @@
 import { Activity, AlertTriangle, ArrowRight, Clock3, DollarSign, UsersRound } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { metricValueAt, replayMetricValue } from './engine';
+import HelpTip from './HelpTip';
 import { scenario } from './scenario';
 import type { OutcomeKind, ToolId } from './types';
 
@@ -72,9 +73,15 @@ export default function IncidentDashboard({
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 px-4 py-3">
             <div className="flex items-center gap-2">
               <Activity aria-hidden="true" className="text-cyan-300" size={16} />
-              <h2 className="font-mono text-xs font-semibold tracking-wider text-slate-200">
-                LIVE TOPOLOGY
-              </h2>
+              <div className="flex items-center gap-1">
+                <h2 className="font-mono text-xs font-semibold tracking-wider text-slate-200">
+                  LIVE TOPOLOGY
+                </h2>
+                <HelpTip label="About the live service map">
+                  The map shows how checkout requests flow through dependent services. Select a
+                  service to jump to related investigation tools.
+                </HelpTip>
+              </div>
             </div>
             <span className="font-mono text-[10px] text-slate-500">CHECKOUT · US-EAST-1</span>
           </div>
@@ -95,9 +102,15 @@ export default function IncidentDashboard({
           <div className="flex items-center justify-between border-b border-slate-800 px-4 py-3">
             <div className="flex items-center gap-2">
               <Activity aria-hidden="true" className="text-cyan-300" size={16} />
-              <h2 className="font-mono text-xs font-semibold tracking-wider text-slate-200">
-                SYSTEM SIGNALS
-              </h2>
+              <div className="flex items-center gap-1">
+                <h2 className="font-mono text-xs font-semibold tracking-wider text-slate-200">
+                  SYSTEM SIGNALS
+                </h2>
+                <HelpTip label="About system signals">
+                  Metrics change as you scrub through the incident timeline. Compare when the
+                  symptoms begin with changes in cache, API, and database behavior.
+                </HelpTip>
+              </div>
             </div>
             <span className="font-mono text-[10px] text-slate-500">
               {outcome ? 'REPLAY' : formatTimeline(scrubMinute)}
@@ -459,9 +472,13 @@ function TimelineScrubber({
   return (
     <section className="rounded-2xl border border-slate-800 bg-slate-900/70 p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="flex items-center gap-2 font-mono text-xs font-semibold tracking-wider text-slate-200">
+        <h2 className="flex items-center gap-1 font-mono text-xs font-semibold tracking-wider text-slate-200">
           <Clock3 aria-hidden="true" className="text-amber-300" size={15} />
           TIME SCRUBBER
+          <HelpTip label="About the incident timeline">
+            Scrub across the incident to see how signals evolve. Some clues are only available
+            before or after a specific event.
+          </HelpTip>
         </h2>
         <span className="font-mono text-xs text-cyan-300">{formatTimeline(value)}</span>
       </div>

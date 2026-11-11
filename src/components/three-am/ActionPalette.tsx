@@ -1,4 +1,5 @@
 import { ArrowRight, Check, Clock3, DollarSign, Ticket, Wrench } from 'lucide-react';
+import HelpTip from './HelpTip';
 import { actionPalette } from './scenario';
 import type { IncidentPhase } from './types';
 
@@ -33,8 +34,12 @@ export default function ActionPalette({
     >
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 px-4 py-3">
         <div>
-          <h2 className="flex items-center gap-2 font-mono text-xs font-semibold tracking-wider text-slate-200">
+          <h2 className="flex items-center gap-1 font-mono text-xs font-semibold tracking-wider text-slate-200">
             <Wrench aria-hidden="true" className="text-amber-300" size={15} /> CHANGE PALETTE
+            <HelpTip label="About the change palette">
+              Choose changes based on your diagnosis. Ticket count, cost, rollout time, and
+              second-order effects all influence the outcome when you replay the incident.
+            </HelpTip>
           </h2>
           <p className="mt-1 text-[10px] text-slate-600">
             Pick up to three changes. Side effects are part of the system.

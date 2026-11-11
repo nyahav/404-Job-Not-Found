@@ -9,6 +9,7 @@ import {
   ShieldAlert,
 } from 'lucide-react';
 import { getAvailableClues } from './engine';
+import HelpTip from './HelpTip';
 import { scenario } from './scenario';
 import { TOOL_LABELS } from './types';
 import type { Clue, ToolId } from './types';
@@ -65,7 +66,15 @@ export default function Toolbelt({
       className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/70"
     >
       <header className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 px-4 py-3">
-        <h2 className="font-mono text-xs font-semibold tracking-wider text-slate-200">TOOLBELT</h2>
+        <div className="flex items-center gap-1">
+          <h2 className="font-mono text-xs font-semibold tracking-wider text-slate-200">
+            TOOLBELT
+          </h2>
+          <HelpTip label="About investigation tools and lookup limits">
+            Choose a tool to inspect evidence. Each clue lookup uses one of your limited lookups, so
+            check the timeline and service signals before spending the budget.
+          </HelpTip>
+        </div>
         <span
           className={`font-mono text-[10px] ${lookupsUsed >= lookupLimit ? 'text-rose-300' : 'text-slate-500'}`}
         >
