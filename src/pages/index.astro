@@ -1,0 +1,68 @@
+---
+import { getCollection } from 'astro:content';
+import Counter from '../components/demos/Counter';
+import SiteLayout from '../layouts/SiteLayout.astro';
+
+const articles = (await getCollection('articles')).sort(
+  (first, second) => second.data.pubDate.valueOf() - first.data.pubDate.valueOf(),
+);
+const basePath = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+---
+
+<SiteLayout
+  title="404 — Job Not Found"
+  description="Articles and interactive demos exploring software and the web."
+>
+  <section class="grid gap-12 md:grid-cols-[1fr_auto] md:items-center">
+    <div>
+      <p class="mb-4 text-sm font-medium tracking-[0.2em] text-cyan-300 uppercase">
+        A place for ideas and experiments
+      </p>
+      <h1 class="max-w-2xl text-5xl font-bold tracking-tight text-white sm:text-6xl">
+        404 <span class="text-cyan-400">—</span> Job Not Found
+      </h1>
+      <p class="mt-6 max-w-xl text-lg leading-8 text-slate-300">
+        Notes, demos, and things worth figuring out along the way.
+      </p>
+    </div>
+    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+      <p class="mb-4 text-sm text-slate-400">A tiny interactive demo</p>
+      <Counter client:load />
+    </div>
+  </section>
+
+  <section id="articles" class="mt-24">
+    <div class="mb-8 flex items-end justify-between gap-4">
+      <div>
+        <p class="text-sm font-medium tracking-[0.2em] text-cyan-300 uppercase">The notebook</p>
+        <h2 class="mt-2 text-3xl font-semibold tracking-tight text-white">Articles</h2>
+      </div>
+    </div>
+    {articles.length > 0 ? (
+      <div class="grid gap-4 sm:grid-cols-2">
+        {articles.map((article) => (
+          <a
+            class="group rounded-2xl border border-slate-800 bg-slate-900/70 p-6 transition hover:border-cyan-500/60"
+            href={`${basePath}articles/${article.id.replace(/\.(md|mdx)$/, '')}/`}
+          >
+            <p class="text-sm text-slate-400">
+              {article.data.pubDate.toLocaleDateString('en', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </p>
+            <h3 class="mt-3 text-xl font-semibold text-white group-hover:text-cyan-300">
+              {article.data.title}
+            </h3>
+            <p class="mt-2 leading-7 text-slate-300">{article.data.description}</p>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <p class="text-slate-400">No articles yet. Add an MDX file to `src/content/articles/`.</p>
+    )}
+  </section>
+</SiteLayout>

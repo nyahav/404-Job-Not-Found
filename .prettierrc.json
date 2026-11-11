@@ -1,0 +1,7 @@
+{
+  "plugins": ["prettier-plugin-astro", "prettier-plugin-tailwindcss"],
+  "tailwindStylesheet": "./src/styles/global.css",
+  "singleQuote": true,
+  "semi": true,
+  "printWidth": 100
+}
