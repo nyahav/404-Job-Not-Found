@@ -8,6 +8,9 @@ island with interactive AWS maps, architecture guides, quizzes, and a design
 sandbox. Its sample projects and quiz questions are bundled from the supplied
 Base44 exports; it does not require the Base44 SDK or API.
 
+The Database Explorer at `/database-explorer/` contains interactive lessons for
+B-Tree page splits, LSM compaction, WAL recovery, MVCC isolation, and query plans.
+
 ## Requirements
 
 - Node.js 22.23.4 or newer

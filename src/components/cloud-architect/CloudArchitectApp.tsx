@@ -93,10 +93,7 @@ export default function CloudArchitectApp() {
           </div>
 
           <section className="mx-auto max-w-7xl px-6 py-14 text-center sm:py-20">
-            <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
-              {project.name}
-            </h1>
-            <p className="mx-auto mt-5 max-w-3xl text-base leading-7 text-slate-400 sm:text-lg sm:leading-8">
+            <p className="mx-auto max-w-3xl text-base leading-7 text-slate-400 sm:text-lg sm:leading-8">
               {project.description}
             </p>
           </section>
