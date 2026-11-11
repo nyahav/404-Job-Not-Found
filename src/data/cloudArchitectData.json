@@ -1,0 +1,1221 @@
+{
+  "projects": [
+    {
+      "id": "69c81f9da6f971d3a052eb7f",
+      "name": "Serverless Image Processing Pipeline",
+      "description": "A production-grade serverless pipeline for uploading, processing, and serving images at scale. Uses S3, Lambda, Rekognition, RDS Aurora, and CloudFront — zero servers to manage.",
+      "tags": ["serverless", "s3", "lambda", "rekognition", "cloudfront", "rds"],
+      "color": "#a855f7",
+      "icon": "",
+      "services": {
+        "user": {
+          "id": "user",
+          "label": "User (Browser)",
+          "icon": "Monitor",
+          "color": "#94a3b8",
+          "glowColor": "rgba(148,163,184,0.3)",
+          "x": 60,
+          "y": 240,
+          "why": {
+            "title": "Why the User?",
+            "text": "The user uploads an image from a browser or mobile app. They receive a pre-signed S3 URL from the API which lets them upload directly to S3 — bypassing your servers entirely. This reduces latency and cost."
+          }
+        },
+        "apigw": {
+          "id": "apigw",
+          "label": "API Gateway",
+          "icon": "Server",
+          "color": "#0ea5e9",
+          "glowColor": "rgba(14,165,233,0.3)",
+          "x": 260,
+          "y": 240,
+          "why": {
+            "title": "Why API Gateway?",
+            "text": "API Gateway is a fully managed HTTP API endpoint. It handles authentication, rate limiting, and routing. Here it receives the upload request and triggers a Lambda to generate a pre-signed S3 URL."
+          },
+          "iamPolicy": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Sid": "InvokeLambda",
+                "Effect": "Allow",
+                "Action": ["lambda:InvokeFunction"],
+                "Resource": "arn:aws:lambda:*:*:function:generate-upload-url"
+              }
+            ]
+          }
+        },
+        "s3": {
+          "id": "s3",
+          "label": "S3 Bucket",
+          "icon": "Database",
+          "color": "#22c55e",
+          "glowColor": "rgba(34,197,94,0.3)",
+          "x": 460,
+          "y": 240,
+          "why": {
+            "title": "Why S3?",
+            "text": "S3 is AWS's object storage — infinitely scalable, 99.999999999% durable. Images are stored here both as originals and processed thumbnails. S3 Event Notifications trigger Lambda automatically when a new upload arrives."
+          }
+        },
+        "processor": {
+          "id": "processor",
+          "label": "Lambda Processor",
+          "icon": "Zap",
+          "color": "#a855f7",
+          "glowColor": "rgba(168,85,247,0.3)",
+          "x": 460,
+          "y": 80,
+          "why": {
+            "title": "Why Lambda for Processing?",
+            "text": "Lambda is triggered automatically by S3 on every new upload. It resizes the image, converts formats, and calls Rekognition for AI analysis. Serverless means you pay only for the milliseconds it runs — no idle cost."
+          },
+          "iamPolicy": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Sid": "S3Access",
+                "Effect": "Allow",
+                "Action": ["s3:GetObject", "s3:PutObject"],
+                "Resource": "arn:aws:s3:::images-bucket/*"
+              },
+              {
+                "Sid": "RekognitionAccess",
+                "Effect": "Allow",
+                "Action": ["rekognition:DetectLabels", "rekognition:DetectModerationLabels"],
+                "Resource": "*"
+              },
+              {
+                "Sid": "RDSAccess",
+                "Effect": "Allow",
+                "Action": ["rds-data:ExecuteStatement"],
+                "Resource": "arn:aws:rds:*:*:cluster:images-db"
+              }
+            ]
+          }
+        },
+        "rekognition": {
+          "id": "rekognition",
+          "label": "Rekognition",
+          "icon": "Cog",
+          "color": "#f59e0b",
+          "glowColor": "rgba(245,158,11,0.3)",
+          "x": 660,
+          "y": 80,
+          "why": {
+            "title": "Why Rekognition?",
+            "text": "AWS Rekognition is a fully managed AI/ML service for image analysis. It detects objects, scenes, faces, and inappropriate content. You pay per API call — no ML expertise or GPU servers required."
+          }
+        },
+        "rds": {
+          "id": "rds",
+          "label": "Aurora (RDS)",
+          "icon": "Database",
+          "color": "#f97316",
+          "glowColor": "rgba(249,115,22,0.3)",
+          "x": 660,
+          "y": 240,
+          "why": {
+            "title": "Why Aurora RDS?",
+            "text": "Aurora Serverless is a relational database that auto-scales to zero when idle. We store image metadata — labels, dimensions, upload timestamps, user IDs — in structured SQL tables. Aurora Data API lets Lambda query it without managing connection pools."
+          }
+        },
+        "cloudfront": {
+          "id": "cloudfront",
+          "label": "CloudFront CDN",
+          "icon": "Mail",
+          "color": "#ef4444",
+          "glowColor": "rgba(239,68,68,0.3)",
+          "x": 460,
+          "y": 400,
+          "why": {
+            "title": "Why CloudFront?",
+            "text": "CloudFront is AWS's global CDN with 450+ edge locations worldwide. Images served via CloudFront are cached near the user — reducing latency from seconds to milliseconds. It also protects your S3 bucket from direct public access."
+          }
+        }
+      },
+      "connections": [
+        {
+          "from": "user",
+          "to": "apigw",
+          "label": "Request Upload URL"
+        },
+        {
+          "from": "apigw",
+          "to": "s3",
+          "label": "Pre-signed Upload"
+        },
+        {
+          "from": "s3",
+          "to": "processor",
+          "label": "S3 Event Trigger"
+        },
+        {
+          "from": "processor",
+          "to": "rekognition",
+          "label": "Analyze Image"
+        },
+        {
+          "from": "processor",
+          "to": "rds",
+          "label": "Save Metadata"
+        },
+        {
+          "from": "cloudfront",
+          "to": "s3",
+          "label": "Origin Fetch"
+        },
+        {
+          "from": "user",
+          "to": "cloudfront",
+          "label": "View Image"
+        }
+      ],
+      "guide_steps": [
+        {
+          "id": 1,
+          "title": "Architecture Overview",
+          "icon": "Network",
+          "color": "#a855f7",
+          "summary": "Understand the serverless image pipeline before building it.",
+          "content": {
+            "intro": "This system handles image upload, AI processing, and global delivery — all without managing a single server. Let's understand the full picture first.",
+            "diagram": "User → API Gateway → S3 (upload)\nS3 Event → Lambda → Rekognition (AI labels)\nLambda → Aurora RDS (store metadata)\nUser → CloudFront → S3 (serve image)",
+            "concepts": [
+              {
+                "title": "Event-Driven Architecture",
+                "icon": "Zap",
+                "color": "#a855f7",
+                "text": "Nothing polls or waits. S3 fires an event when an image arrives, Lambda wakes up instantly. This is reactive programming at the infrastructure level — pure pay-per-use."
+              },
+              {
+                "title": "Pre-signed URLs",
+                "icon": "Link",
+                "color": "#0ea5e9",
+                "text": "Instead of routing the image through your API server (slow, expensive), you give the user a temporary URL to upload directly to S3. The URL expires in 5 minutes and is scoped to a single object."
+              },
+              {
+                "title": "Separation of Concerns",
+                "icon": "Layers",
+                "color": "#22c55e",
+                "text": "Upload, processing, storage, and delivery are completely decoupled services. You can swap CloudFront for another CDN or Rekognition for a custom model without touching the rest."
+              }
+            ],
+            "tradeoffs": [
+              {
+                "pro": "Zero infrastructure to manage or patch",
+                "con": "Cold starts on Lambda add 100-300ms latency on first invocation"
+              },
+              {
+                "pro": "Cost scales to zero when unused",
+                "con": "Vendor lock-in — tightly coupled to AWS services"
+              },
+              {
+                "pro": "Rekognition gives AI capabilities with no ML expertise",
+                "con": "Rekognition costs add up at high image volumes"
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "title": "S3 Bucket Setup",
+          "icon": "Database",
+          "color": "#22c55e",
+          "summary": "Create the S3 bucket with correct permissions and event notifications.",
+          "content": {
+            "intro": "S3 is the heart of this system. All images land here. We need two prefixes: uploads/ (originals) and processed/ (thumbnails). S3 events will wake up Lambda automatically.",
+            "code": "# Create the bucket\naws s3api create-bucket \\\n  --bucket my-images-bucket \\\n  --region $AWS_REGION \\\n  --create-bucket-configuration LocationConstraint=$AWS_REGION\n\n# Block all public access (CloudFront will serve images)\naws s3api put-public-access-block \\\n  --bucket my-images-bucket \\\n  --public-access-block-configuration \\\n    BlockPublicAcls=true,IgnorePublicAcls=true,\\\n    BlockPublicPolicy=true,RestrictPublicBuckets=true\n\n# Enable versioning for safety\naws s3api put-bucket-versioning \\\n  --bucket my-images-bucket \\\n  --versioning-configuration Status=Enabled\n\n# Add S3 event notification to trigger Lambda on upload\naws s3api put-bucket-notification-configuration \\\n  --bucket my-images-bucket \\\n  --notification-configuration file://s3-notification.json",
+            "verify": "aws s3api get-bucket-notification-configuration --bucket my-images-bucket",
+            "concepts": [
+              {
+                "title": "Block Public Access",
+                "text": "Never make S3 buckets public directly. CloudFront uses an Origin Access Control (OAC) to fetch from S3 privately. This prevents data leaks and hotlinking."
+              },
+              {
+                "title": "S3 Event Notifications",
+                "text": "s3:ObjectCreated:* fires for every new upload. You filter by prefix (uploads/) so Lambda only triggers on originals, not on processed thumbnails it writes back."
+              },
+              {
+                "title": "Object Key Convention",
+                "text": "Use a predictable key structure: uploads/{userId}/{timestamp}-{filename}. This makes IAM path-based policies simple and enables per-user lifecycle rules."
+              }
+            ],
+            "tradeoffs": [
+              {
+                "pro": "Unlimited storage — no capacity planning needed",
+                "con": "No native directory structure — key prefixes simulate folders"
+              },
+              {
+                "pro": "S3 events are free and near-instant",
+                "con": "Event delivery is eventually consistent — rare duplicate events possible"
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "title": "Lambda Processor",
+          "icon": "Zap",
+          "color": "#a855f7",
+          "summary": "Write the Lambda that resizes images and calls Rekognition.",
+          "content": {
+            "intro": "The processor Lambda is the brain. It reads the uploaded image from S3, resizes it to a thumbnail, calls Rekognition for AI labels, then writes results to Aurora and the processed image back to S3.",
+            "code": "# Create Lambda execution role\naws iam create-role \\\n  --role-name lambda-image-processor-role \\\n  --assume-role-policy-document file://lambda-trust-policy.json\n\naws iam attach-role-policy \\\n  --role-name lambda-image-processor-role \\\n  --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole\n\naws iam put-role-policy \\\n  --role-name lambda-image-processor-role \\\n  --policy-name ImageProcessorPolicy \\\n  --policy-document file://processor-policy.json\n\n# Deploy the Lambda\naws lambda create-function \\\n  --function-name image-processor \\\n  --runtime nodejs20.x \\\n  --role arn:aws:iam::$ACCOUNT_ID:role/lambda-image-processor-role \\\n  --handler index.handler \\\n  --zip-file fileb://function.zip \\\n  --timeout 30 \\\n  --memory-size 512 \\\n  --environment Variables='{DB_CLUSTER_ARN=$DB_ARN,DB_SECRET_ARN=$SECRET_ARN}'",
+            "verify": "aws lambda invoke --function-name image-processor --payload file://test-event.json response.json && cat response.json",
+            "concepts": [
+              {
+                "title": "Memory = CPU",
+                "text": "Lambda allocates CPU proportionally to memory. Image processing is CPU-intensive — 512MB gives decent performance. 1769MB = 1 full vCPU."
+              },
+              {
+                "title": "Timeout Planning",
+                "text": "Set timeout to 3x your expected execution time. A 1MB image typically processes in 3-5 seconds. We set 30s as a safety margin."
+              },
+              {
+                "title": "Layer for Sharp (image lib)",
+                "text": "Use a Lambda Layer for native image processing libraries like Sharp. Layers are shared across functions and keep your deployment package small."
+              }
+            ],
+            "tradeoffs": [
+              {
+                "pro": "Scales from 0 to 1000 concurrent executions automatically",
+                "con": "15-minute max execution limit — not suitable for video processing"
+              },
+              {
+                "pro": "No server to patch or maintain",
+                "con": "Cold starts add latency — use Provisioned Concurrency for latency-sensitive flows"
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "title": "Rekognition Integration",
+          "icon": "Cog",
+          "color": "#f59e0b",
+          "summary": "Add AI-powered image analysis with zero ML infrastructure.",
+          "content": {
+            "intro": "AWS Rekognition analyzes images and returns labels (objects, scenes), moderation flags (adult/violent content), and confidence scores. One API call, no model training required.",
+            "code": "# Test Rekognition directly against an S3 object\naws rekognition detect-labels \\\n  --image '{\"S3Object\":{\"Bucket\":\"my-images-bucket\",\"Name\":\"uploads/test.jpg\"}}' \\\n  --max-labels 10 \\\n  --min-confidence 75 \\\n  --region $AWS_REGION\n\n# Test content moderation\naws rekognition detect-moderation-labels \\\n  --image '{\"S3Object\":{\"Bucket\":\"my-images-bucket\",\"Name\":\"uploads/test.jpg\"}}' \\\n  --min-confidence 60 \\\n  --region $AWS_REGION",
+            "verify": "aws rekognition describe-project-versions --project-arn $PROJECT_ARN --region $AWS_REGION 2>/dev/null || echo 'Using standard Rekognition APIs'",
+            "concepts": [
+              {
+                "title": "Confidence Scores",
+                "text": "Every label comes with a confidence percentage (0-100). Set min-confidence to 75+ for production — lower values produce noisy results."
+              },
+              {
+                "title": "Content Moderation",
+                "text": "DetectModerationLabels returns a hierarchy: Explicit Nudity > Nudity > Graphic Male Nudity etc. Store the top-level category in your DB for fast filtering."
+              },
+              {
+                "title": "Billing Model",
+                "text": "Rekognition charges per image analyzed (~$0.001 per image after free tier). For 1M images/month: ~$1,000. Compare to training and hosting your own model."
+              }
+            ],
+            "tradeoffs": [
+              {
+                "pro": "No ML expertise needed — call an API, get results",
+                "con": "Black box — you cannot inspect or retrain the model"
+              },
+              {
+                "pro": "Handles massive scale with no infrastructure",
+                "con": "Costs increase linearly — at 10M+ images/month, custom models may be cheaper"
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "title": "Aurora Serverless DB",
+          "icon": "Database",
+          "color": "#f97316",
+          "summary": "Store image metadata in a serverless relational database.",
+          "content": {
+            "intro": "Aurora Serverless v2 auto-scales from minimum capacity to handle traffic spikes, and scales back to near-zero when idle. The Data API lets Lambda query it without managing connection pools.",
+            "code": "# Create Aurora Serverless v2 cluster\naws rds create-db-cluster \\\n  --db-cluster-identifier images-db \\\n  --engine aurora-mysql \\\n  --engine-version 8.0.mysql_aurora.3.04.0 \\\n  --serverless-v2-scaling-configuration MinCapacity=0.5,MaxCapacity=4 \\\n  --master-username admin \\\n  --manage-master-user-password \\\n  --enable-http-endpoint \\\n  --region $AWS_REGION\n\n# Create the images metadata table (run via Data API)\naws rds-data execute-statement \\\n  --resource-arn $DB_CLUSTER_ARN \\\n  --secret-arn $SECRET_ARN \\\n  --database images \\\n  --sql \"CREATE TABLE images (\n    id VARCHAR(36) PRIMARY KEY,\n    user_id VARCHAR(255) NOT NULL,\n    s3_key VARCHAR(1024) NOT NULL,\n    thumbnail_key VARCHAR(1024),\n    labels JSON,\n    moderation_flags JSON,\n    width INT, height INT,\n    file_size_bytes INT,\n    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n    INDEX idx_user_id (user_id)\n  );\"",
+            "verify": "aws rds describe-db-clusters --db-cluster-identifier images-db --query 'DBClusters[0].Status'",
+            "concepts": [
+              {
+                "title": "Serverless v2 ACUs",
+                "text": "Aurora Capacity Units (ACUs) define compute + memory. 0.5 ACU = minimum (saves cost at low traffic). Each ACU ~ 2GB RAM. For image metadata queries, 0.5-1 ACU is plenty."
+              },
+              {
+                "title": "HTTP Endpoint (Data API)",
+                "text": "Lambda can query Aurora over HTTPS using the Data API — no VPC, no connection pooling. This is perfect for serverless since Lambda doesn't maintain persistent DB connections."
+              },
+              {
+                "title": "JSON Column for Labels",
+                "text": "Storing Rekognition labels as JSON lets you add new label types without schema migrations. You can still query them with MySQL JSON functions: WHERE JSON_CONTAINS(labels, '\"Dog\"')."
+              }
+            ],
+            "tradeoffs": [
+              {
+                "pro": "Scales to zero — pay almost nothing when idle",
+                "con": "Cold start when scaling from zero adds ~5 seconds latency"
+              },
+              {
+                "pro": "Fully managed — automated backups, multi-AZ failover",
+                "con": "Data API has a 1MB response limit — not suitable for large result sets"
+              }
+            ]
+          }
+        },
+        {
+          "id": 6,
+          "title": "CloudFront CDN",
+          "icon": "Mail",
+          "color": "#ef4444",
+          "summary": "Serve images globally with low latency via a CDN.",
+          "content": {
+            "intro": "CloudFront caches your S3 images at 450+ edge locations worldwide. A user in Tokyo gets an image from a Tokyo edge node, not your S3 bucket in us-east-1. Setup takes 15 minutes and costs almost nothing.",
+            "code": "# Create Origin Access Control (replaces legacy OAI)\naws cloudfront create-origin-access-control \\\n  --origin-access-control-config \\\n    Name=images-oac,OriginAccessControlOriginType=s3,\\\n    SigningBehavior=always,SigningProtocol=sigv4\n\n# Create the distribution\naws cloudfront create-distribution \\\n  --distribution-config file://cf-distribution.json\n\n# Update S3 bucket policy to allow only CloudFront\naws s3api put-bucket-policy \\\n  --bucket my-images-bucket \\\n  --policy file://s3-bucket-policy.json\n\n# Invalidate cache after processing (call from Lambda)\naws cloudfront create-invalidation \\\n  --distribution-id $CF_DIST_ID \\\n  --paths '/processed/*'",
+            "verify": "aws cloudfront get-distribution --id $CF_DIST_ID --query 'Distribution.Status'",
+            "concepts": [
+              {
+                "title": "Origin Access Control (OAC)",
+                "text": "OAC is the modern way to let CloudFront access S3 privately. It uses SigV4 signing — more secure than the legacy Origin Access Identity (OAI). S3 bucket stays fully private."
+              },
+              {
+                "title": "Cache Behaviors",
+                "text": "Configure TTL per path prefix. Cache /processed/* for 30 days (immutable thumbnails). Cache /uploads/* for 1 hour. Use Cache-Control headers from Lambda for fine-grained control."
+              },
+              {
+                "title": "Cache Invalidation",
+                "text": "After Lambda processes an image and writes the thumbnail, invalidate the CloudFront path so the next request fetches the new file. First 1,000 invalidations/month are free."
+              }
+            ],
+            "tradeoffs": [
+              {
+                "pro": "Sub-50ms image delivery worldwide",
+                "con": "Cache invalidation can take up to 60 seconds to propagate globally"
+              },
+              {
+                "pro": "Reduces S3 GET request costs dramatically",
+                "con": "CloudFront has its own data transfer costs — analyze at scale"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "69c812524c575e7bb5088f50",
+      "name": "Job Processing System",
+      "description": "A production-grade async job processing pipeline using EC2, SQS, DynamoDB, Lambda and ECR. Learn how to decouple services and handle failures with Dead Letter Queues.",
+      "tags": ["EC2", "SQS", "DynamoDB", "Lambda", "ECR", "IAM"],
+      "color": "#0ea5e9",
+      "icon": "",
+      "services": {
+        "client": {
+          "id": "client",
+          "label": "Client",
+          "icon": "Monitor",
+          "color": "#94a3b8",
+          "glowColor": "rgba(148,163,184,0.3)",
+          "x": 80,
+          "y": 250,
+          "why": {
+            "title": "Why a Client?",
+            "text": "The client is anyone sending a request to the API — a website, mobile app, or a curl command in the terminal. It sends an HTTP request and receives a response containing a Job ID."
+          }
+        },
+        "api": {
+          "id": "api",
+          "label": "API Server (EC2)",
+          "icon": "Server",
+          "color": "#0ea5e9",
+          "glowColor": "rgba(14,165,233,0.3)",
+          "x": 300,
+          "y": 250,
+          "why": {
+            "title": "Why EC2 for the API?",
+            "text": "EC2 gives us a virtual server with full control over the OS. The API runs as a Docker Container on EC2, accepting HTTP requests on port 8080. It saves the Job to DynamoDB and publishes a message to SQS."
+          },
+          "iamPolicy": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Sid": "DynamoDBAccess",
+                "Effect": "Allow",
+                "Action": [
+                  "dynamodb:PutItem",
+                  "dynamodb:GetItem",
+                  "dynamodb:UpdateItem",
+                  "dynamodb:Query"
+                ],
+                "Resource": [
+                  "arn:aws:dynamodb:*:*:table/Jobs",
+                  "arn:aws:dynamodb:*:*:table/Jobs/index/*"
+                ]
+              },
+              {
+                "Sid": "SQSAccess",
+                "Effect": "Allow",
+                "Action": ["sqs:SendMessage"],
+                "Resource": "arn:aws:sqs:*:*:jobs-queue"
+              },
+              {
+                "Sid": "ParameterStoreAccess",
+                "Effect": "Allow",
+                "Action": ["ssm:GetParameter", "ssm:GetParameters"],
+                "Resource": "arn:aws:ssm:*:*:parameter/jobsys/*"
+              }
+            ]
+          }
+        },
+        "dynamodb": {
+          "id": "dynamodb",
+          "label": "DynamoDB",
+          "icon": "Database",
+          "color": "#8b5cf6",
+          "glowColor": "rgba(139,92,246,0.3)",
+          "x": 300,
+          "y": 80,
+          "why": {
+            "title": "Why DynamoDB?",
+            "text": "DynamoDB is a fully managed NoSQL database — AWS handles all maintenance, scaling, and backups. It offers millisecond latency and a generous free tier (25 read/write capacity units). We store all Jobs here with their current status."
+          }
+        },
+        "sqs": {
+          "id": "sqs",
+          "label": "SQS Queue",
+          "icon": "Mail",
+          "color": "#f59e0b",
+          "glowColor": "rgba(245,158,11,0.3)",
+          "x": 540,
+          "y": 250,
+          "why": {
+            "title": "Why SQS?",
+            "text": "SQS is a message queue — think of it as a post office box. The API drops messages in, and the Worker picks them up. This is called Decoupling: the API doesn't wait for the Worker to finish. If the Worker crashes, messages safely wait in the queue."
+          }
+        },
+        "worker": {
+          "id": "worker",
+          "label": "Worker (EC2)",
+          "icon": "Cog",
+          "color": "#22c55e",
+          "glowColor": "rgba(34,197,94,0.3)",
+          "x": 780,
+          "y": 250,
+          "why": {
+            "title": "Why a separate Worker?",
+            "text": "The Worker runs as a separate Docker Container (on the same or different EC2). It polls SQS for messages and processes them. Keeping it separate enables independent scaling — add more Workers without touching the API."
+          }
+        },
+        "dlq": {
+          "id": "dlq",
+          "label": "Dead Letter Queue",
+          "icon": "AlertTriangle",
+          "color": "#ef4444",
+          "glowColor": "rgba(239,68,68,0.3)",
+          "x": 540,
+          "y": 430,
+          "why": {
+            "title": "Why a Dead Letter Queue?",
+            "text": "The DLQ holds messages that failed processing 3 times (Redrive Policy). Instead of retrying infinitely, failed messages are moved here for investigation. This keeps the main queue clean and prevents poison-pill messages from blocking other jobs."
+          }
+        },
+        "lambda": {
+          "id": "lambda",
+          "label": "Lambda (Serverless)",
+          "icon": "Zap",
+          "color": "#f97316",
+          "glowColor": "rgba(249,115,22,0.3)",
+          "x": 780,
+          "y": 430,
+          "why": {
+            "title": "Why Lambda?",
+            "text": "Lambda is serverless compute — no server to manage! It runs automatically when a message arrives in the DLQ. It updates DynamoDB to mark the job as FAILED. You pay only for execution time (milliseconds), making it perfect for rare error-handling tasks."
+          }
+        }
+      },
+      "connections": [
+        {
+          "from": "client",
+          "to": "api",
+          "label": "HTTP Request"
+        },
+        {
+          "from": "api",
+          "to": "dynamodb",
+          "label": "Store Job"
+        },
+        {
+          "from": "api",
+          "to": "sqs",
+          "label": "Send Message"
+        },
+        {
+          "from": "sqs",
+          "to": "worker",
+          "label": "Receive Message"
+        },
+        {
+          "from": "worker",
+          "to": "dynamodb",
+          "label": "Update Status"
+        },
+        {
+          "from": "sqs",
+          "to": "dlq",
+          "label": "After 3 Failures"
+        },
+        {
+          "from": "dlq",
+          "to": "lambda",
+          "label": "Trigger"
+        },
+        {
+          "from": "lambda",
+          "to": "dynamodb",
+          "label": "Mark Failed"
+        }
+      ],
+      "guide_steps": [
+        {
+          "id": 1,
+          "title": "Architecture Overview",
+          "icon": "Network",
+          "color": "#0ea5e9",
+          "summary": "Understand the full data flow before building anything.",
+          "content": {
+            "intro": "Before writing a single CLI command, understand what we're building and why each service exists.",
+            "diagram": "Client → API (EC2) → DynamoDB (store job) → SQS (send message)\n                   \nWorker (EC2) ← SQS (receive message) → DynamoDB (update job status)\n           \nDLQ (SQS) → Lambda → DynamoDB (mark as failed)",
+            "concepts": [
+              {
+                "title": "Loosely Coupled Architecture",
+                "icon": "Link",
+                "color": "#0ea5e9",
+                "text": "Services communicate through AWS APIs, not direct connections. The API doesn't call the Worker directly — it drops a message in SQS and moves on. This is called async/event-driven architecture."
+              },
+              {
+                "title": "Managed Services",
+                "icon": "Cloud",
+                "color": "#8b5cf6",
+                "text": "DynamoDB, SQS, and Lambda are fully managed — AWS handles servers, updates, backups, and scaling. You configure and use them. Compare: DynamoDB vs. MySQL on EC2 (you'd manage the DB server yourself)."
+              },
+              {
+                "title": "The Cloud Mental Model",
+                "icon": "Lightbulb",
+                "color": "#f59e0b",
+                "text": "Old way: Buy a car, maintain it, insure it. Cloud way: Use Uber — pay per ride, zero maintenance. AWS lets you rent compute, storage, and queuing instead of owning the hardware."
+              }
+            ],
+            "tradeoffs": [
+              {
+                "pro": "API responds instantly — doesn't wait for job processing",
+                "con": "More complex architecture to debug"
+              },
+              {
+                "pro": "Worker failures don't affect the API or user experience",
+                "con": "Eventual consistency — job status updates are not immediate"
+              },
+              {
+                "pro": "Each component scales independently",
+                "con": "More AWS services to learn and manage"
+              }
+            ]
+          }
+        },
+        {
+          "id": 2,
+          "title": "DynamoDB Table",
+          "icon": "Database",
+          "color": "#8b5cf6",
+          "summary": "Create the NoSQL database that stores all job records.",
+          "content": {
+            "intro": "DynamoDB is a fully managed NoSQL database. Think of it as a giant key-value store where each row can have different attributes.",
+            "whyThis": "We chose DynamoDB over running MySQL on EC2 because we don't want to manage a database server. AWS handles replication, backups, and scaling automatically.",
+            "code": "aws dynamodb create-table \\\n    --table-name Jobs \\\n    --attribute-definitions \\\n        AttributeName=jobId,AttributeType=S \\\n        AttributeName=idempotencyKey,AttributeType=S \\\n    --key-schema \\\n        AttributeName=jobId,KeyType=HASH \\\n    --global-secondary-indexes \\\n        'IndexName=idempotencyKey-index,\\\n        KeySchema=[{AttributeName=idempotencyKey,KeyType=HASH}],\\\n        Projection={ProjectionType=ALL},\\\n        ProvisionedThroughput={ReadCapacityUnits=5,WriteCapacityUnits=5}' \\\n    --billing-mode PROVISIONED \\\n    --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \\\n    --region $AWS_REGION",
+            "verify": "aws dynamodb describe-table --table-name Jobs --region $AWS_REGION",
+            "concepts": [
+              {
+                "title": "Primary Key (jobId)",
+                "text": "Every item in DynamoDB needs a unique primary key. jobId is our HASH key — like a row ID in SQL."
+              },
+              {
+                "title": "Global Secondary Index",
+                "text": "Allows querying by idempotencyKey. Without this index, you'd have to scan the entire table — expensive and slow."
+              },
+              {
+                "title": "Provisioned vs On-Demand",
+                "text": "PROVISIONED mode: you specify capacity upfront (free tier: 25 RCU/WCU). ON_DEMAND: pay per request, auto-scales. We use PROVISIONED to stay in free tier."
+              }
+            ],
+            "tradeoffs": [
+              {
+                "pro": "No server management — AWS handles everything",
+                "con": "NoSQL means no JOINs — data model must be designed carefully"
+              },
+              {
+                "pro": "Millisecond latency at any scale",
+                "con": "Querying non-primary-key fields requires a GSI (extra cost/complexity)"
+              },
+              {
+                "pro": "Serverless billing — pay per request with On-Demand",
+                "con": "Provisioned capacity can be wasted if traffic is unpredictable"
+              }
+            ]
+          }
+        },
+        {
+          "id": 3,
+          "title": "SQS Queues",
+          "icon": "Mail",
+          "color": "#f59e0b",
+          "summary": "Set up the message queue and dead letter queue for async job processing.",
+          "content": {
+            "intro": "SQS is a message queue — like a post office. The API puts messages in, the Worker takes them out. Messages wait safely even if the Worker is down.",
+            "whyThis": "We chose SQS over running RabbitMQ on EC2 because SQS is serverless — no broker to manage, patch, or scale. It stores messages durably until processed.",
+            "code": "# Create main queue\naws sqs create-queue \\\n    --queue-name jobs-queue \\\n    --attributes VisibilityTimeout=300,MessageRetentionPeriod=1209600 \\\n    --region $AWS_REGION\n\n# Create Dead Letter Queue\naws sqs create-queue \\\n    --queue-name jobs-dlq \\\n    --attributes MessageRetentionPeriod=1209600 \\\n    --region $AWS_REGION\n\n# Connect DLQ to main queue (after 3 failed attempts)\naws sqs set-queue-attributes \\\n    --queue-url \"$QUEUE_URL\" \\\n    --attributes '{\"RedrivePolicy\":\"{\\\"deadLetterTargetArn\\\":\\\"$DLQ_ARN\\\",\\\"maxReceiveCount\\\":3}\"}' \\\n    --region $AWS_REGION",
+            "verify": "aws sqs list-queues --region $AWS_REGION",
+            "concepts": [
+              {
+                "title": "Visibility Timeout (300s)",
+                "text": "When a Worker reads a message, it becomes invisible to other Workers for 5 minutes. If not deleted in time (job failed), it reappears for retry."
+              },
+              {
+                "title": "Message Retention (14 days)",
+                "text": "Messages are kept for 14 days if not processed. Useful if your Worker is down for a while — no messages are lost."
+              },
+              {
+                "title": "Redrive Policy (maxReceiveCount=3)",
+                "text": "After 3 failed processing attempts, the message is automatically moved to the DLQ. This prevents infinite retry loops from blocking your queue."
+              }
+            ],
+            "tradeoffs": [
+              {
+                "pro": "Messages persist even if Worker crashes",
+                "con": "At-least-once delivery — Workers must be idempotent (same message processed twice = same result)"
+              },
+              {
+                "pro": "Decouples API from Worker — independent scaling",
+                "con": "Not real-time — there's a small delay between enqueue and process"
+              },
+              {
+                "pro": "DLQ catches poison-pill messages automatically",
+                "con": "Max message size is 256KB — large payloads need S3 + pointer pattern"
+              }
+            ]
+          }
+        },
+        {
+          "id": 4,
+          "title": "ECR Repositories",
+          "icon": "Package",
+          "color": "#22c55e",
+          "summary": "Create private Docker image registries for the API and Worker.",
+          "content": {
+            "intro": "ECR (Elastic Container Registry) is AWS's private Docker registry. Think of it as Docker Hub, but private and integrated with AWS IAM.",
+            "whyThis": "We use ECR instead of Docker Hub because ECR integrates natively with IAM — no credentials needed when pulling images from EC2. It's also private by default.",
+            "code": "# Get your AWS account ID\nACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)\n\n# Create API repository\naws ecr create-repository \\\n    --repository-name svc-api \\\n    --region $AWS_REGION\n\n# Create Worker repository\naws ecr create-repository \\\n    --repository-name svc-worker \\\n    --region $AWS_REGION\n\n# Build and push images\naws ecr get-login-password --region $AWS_REGION | \\\n    docker login --username AWS --password-stdin \\\n    $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com\n\ndocker build -t svc-api:latest ./services/svc-api\ndocker tag svc-api:latest $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/svc-api:latest\ndocker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/svc-api:latest",
+            "verify": "aws ecr list-images --repository-name svc-api --region $AWS_REGION",
+            "concepts": [
+              {
+                "title": "Docker Images as Shipping Containers",
+                "text": "A Docker image packages your app + all dependencies. It runs identically on your laptop, CI/CD, and EC2. 'Works on my machine' problem: solved."
+              },
+              {
+                "title": "IAM-based Pull Auth",
+                "text": "EC2 with the right IAM role can pull ECR images without any credentials. AWS handles token rotation automatically via the instance metadata service."
+              },
+              {
+                "title": "Image Tags",
+                "text": "We use :latest for simplicity. In production, use commit SHA tags (e.g., :abc1234) for reproducible deploys and easy rollbacks."
+              }
+            ],
+            "tradeoffs": [
+              {
+                "pro": "IAM-integrated — no credential management for EC2 pulls",
+                "con": "Cross-region pulls are slow and cost egress fees"
+              },
+              {
+                "pro": "Private by default — no accidental public exposure",
+                "con": "Costs $0.10/GB storage (small images are essentially free)"
+              },
+              {
+                "pro": "Lifecycle policies can auto-delete old images",
+                "con": "Requires Docker installed locally to build and push"
+              }
+            ]
+          }
+        },
+        {
+          "id": 5,
+          "title": "IAM Roles & Policies",
+          "icon": "Shield",
+          "color": "#ef4444",
+          "summary": "Define what each service is allowed to do — the Principle of Least Privilege.",
+          "content": {
+            "intro": "IAM (Identity and Access Management) is AWS's permission system. It controls who can do what. This is the most security-critical step.",
+            "whyThis": "Without IAM, any service could access any resource. A compromised EC2 instance could delete your database. IAM limits blast radius by granting minimum necessary permissions.",
+            "code": "# Create EC2 trust policy (who can assume this role)\ncat > /tmp/ec2-trust-policy.json <<EOF\n{\n  \"Version\": \"2012-10-17\",\n  \"Statement\": [{\n    \"Effect\": \"Allow\",\n    \"Principal\": { \"Service\": \"ec2.amazonaws.com\" },\n    \"Action\": \"sts:AssumeRole\"\n  }]\n}\nEOF\n\n# Create role\naws iam create-role \\\n    --role-name jobsys-ec2-role \\\n    --assume-role-policy-document file:///tmp/ec2-trust-policy.json\n\n# Attach permissions policy (DynamoDB + SQS + SSM + ECR)\naws iam put-role-policy \\\n    --role-name jobsys-ec2-role \\\n    --policy-name jobsys-ec2-policy \\\n    --policy-document file:///tmp/ec2-policy.json\n\n# Create instance profile (so EC2 can use the role)\naws iam create-instance-profile \\\n    --instance-profile-name jobsys-ec2-role\n\naws iam add-role-to-instance-profile \\\n    --instance-profile-name jobsys-ec2-role \\\n    --role-name jobsys-ec2-role",
+            "verify": "aws iam get-role --role-name jobsys-ec2-role",
+            "concepts": [
+              {
+                "title": "Trust Policy vs Permission Policy",
+                "text": "Trust policy: WHO can use this role (e.g., EC2 service). Permission policy: WHAT that role can do (e.g., SQS:SendMessage). Both are required."
+              },
+              {
+                "title": "Instance Profile → IMDS",
+                "text": "EC2 gets temporary credentials via the Instance Metadata Service at 169.254.169.254. Your app calls AWS SDKs — they automatically fetch credentials from IMDS. Zero hardcoded keys."
+              },
+              {
+                "title": "Principle of Least Privilege",
+                "text": "Grant only the minimum permissions needed. The API can SendMessage to SQS but cannot DeleteQueue. If the API is compromised, the attacker can't destroy infrastructure."
+              }
+            ],
+            "tradeoffs": [
+              {
+                "pro": "No hardcoded credentials — temporary tokens auto-rotate every ~6 hours",
+                "con": "IAM policies can be complex — easy to make overly permissive mistakes"
+              },
+              {
+                "pro": "Fine-grained control per service (API vs Worker vs Lambda)",
+                "con": "Resource ARNs must be exact — wildcard (*) opens security holes"
+              },
+              {
+                "pro": "CloudTrail audits every API call made by each role",
+                "con": "Debugging IAM denials can be frustrating — use IAM Policy Simulator"
+              }
+            ]
+          }
+        },
+        {
+          "id": 6,
+          "title": "EC2 Instance",
+          "icon": "Server",
+          "color": "#0ea5e9",
+          "summary": "Launch a virtual server to run the API and Worker containers.",
+          "content": {
+            "intro": "EC2 (Elastic Compute Cloud) is a virtual server in the cloud. You choose the OS, instance type, and configuration. Your Docker containers run here.",
+            "whyThis": "We use EC2 because our API and Worker are long-running processes. Lambda has a 15-minute timeout and cold starts. EC2 gives us full control and predictable performance.",
+            "code": "# Get default VPC\nVPC_ID=$(aws ec2 describe-vpcs \\\n    --filters \"Name=isDefault,Values=true\" \\\n    --query 'Vpcs[0].VpcId' --output text)\n\n# Create security group (firewall)\nSG_ID=$(aws ec2 create-security-group \\\n    --group-name jobsys-ec2-sg \\\n    --description \"Security group for jobsys\" \\\n    --vpc-id \"$VPC_ID\" \\\n    --query 'GroupId' --output text)\n\n# Allow SSH from your IP only\nMY_IP=$(curl -s https://checkip.amazonaws.com)\naws ec2 authorize-security-group-ingress \\\n    --group-id \"$SG_ID\" --protocol tcp \\\n    --port 22 --cidr \"$MY_IP/32\"\n\n# Allow API traffic from anywhere\naws ec2 authorize-security-group-ingress \\\n    --group-id \"$SG_ID\" --protocol tcp \\\n    --port 8080 --cidr 0.0.0.0/0\n\n# Launch instance (t3.micro = free tier)\nINSTANCE_ID=$(aws ec2 run-instances \\\n    --image-id \"$AMI_ID\" \\\n    --instance-type t3.micro \\\n    --security-group-ids \"$SG_ID\" \\\n    --iam-instance-profile Name=jobsys-ec2-role \\\n    --user-data file:///tmp/user-data.sh \\\n    --query 'Instances[0].InstanceId' --output text)",
+            "verify": "aws ec2 describe-instances --instance-ids \"$INSTANCE_ID\" \\\n    --query 'Reservations[0].Instances[0].State.Name'",
+            "concepts": [
+              {
+                "title": "Security Groups as Firewalls",
+                "text": "Security groups are stateful firewalls. We only open port 22 (SSH) from our IP and port 8080 for the API. All other traffic is denied by default."
+              },
+              {
+                "title": "User Data Script",
+                "text": "A bash script that runs once on first boot. We use it to install Docker, pull images from ECR, and start our containers automatically."
+              },
+              {
+                "title": "t3.micro (Free Tier)",
+                "text": "750 hours/month free for 12 months. t3.micro = 2 vCPUs + 1GB RAM. Enough for learning. In production, right-size based on load testing."
+              }
+            ],
+            "tradeoffs": [
+              {
+                "pro": "Full OS control — install anything, any runtime",
+                "con": "You manage OS patching, Docker updates, and app restarts"
+              },
+              {
+                "pro": "Persistent — always running, no cold starts",
+                "con": "Costs money even when idle (vs Lambda which is pay-per-invocation)"
+              },
+              {
+                "pro": "Familiar deployment model for most developers",
+                "con": "Horizontal scaling requires Load Balancer + Auto Scaling Group setup"
+              }
+            ]
+          }
+        },
+        {
+          "id": 7,
+          "title": "Lambda + DLQ Handler",
+          "icon": "Zap",
+          "color": "#f97316",
+          "summary": "Create a serverless function triggered automatically by the Dead Letter Queue.",
+          "content": {
+            "intro": "Lambda is serverless compute — write a function, AWS runs it. No server to provision, patch, or manage. Perfect for event-driven tasks like handling failed jobs.",
+            "whyThis": "We use Lambda for DLQ processing because it only runs when there's a failed message. Running a dedicated EC2 instance 24/7 for rare failure events would be wasteful and expensive.",
+            "code": "# Create Lambda IAM role\naws iam create-role \\\n    --role-name dlq-handler-role \\\n    --assume-role-policy-document file:///tmp/lambda-trust-policy.json\n\n# Attach DynamoDB + CloudWatch permissions\naws iam put-role-policy \\\n    --role-name dlq-handler-role \\\n    --policy-name dlq-handler-policy \\\n    --policy-document file:///tmp/lambda-policy.json\n\n# Create Lambda function from zip\naws lambda create-function \\\n    --function-name dlq-handler \\\n    --runtime python3.11 \\\n    --role \"$LAMBDA_ROLE_ARN\" \\\n    --handler lambda_function.lambda_handler \\\n    --zip-file fileb://dlq-handler.zip \\\n    --timeout 30 \\\n    --memory-size 256 \\\n    --environment \"Variables={DDB_TABLE=Jobs}\"\n\n# Connect DLQ → Lambda (event source mapping)\naws lambda create-event-source-mapping \\\n    --function-name dlq-handler \\\n    --event-source-arn \"$DLQ_ARN\" \\\n    --batch-size 1",
+            "verify": "aws lambda get-function --function-name dlq-handler\naws lambda list-event-source-mappings --function-name dlq-handler",
+            "concepts": [
+              {
+                "title": "Event Source Mapping",
+                "text": "This is the 'wire' between DLQ and Lambda. When a message arrives in the DLQ, Lambda is triggered automatically. No polling code needed — AWS manages this."
+              },
+              {
+                "title": "Lambda Cold Starts",
+                "text": "First invocation after inactivity takes longer (cold start). For our DLQ handler, this is fine — a few hundred ms delay on rare error events is acceptable."
+              },
+              {
+                "title": "Concurrency & Scaling",
+                "text": "Lambda auto-scales to handle multiple messages simultaneously. Each invocation is isolated. With batch-size=1, each message gets its own Lambda execution."
+              }
+            ],
+            "tradeoffs": [
+              {
+                "pro": "Zero infrastructure management — just upload code",
+                "con": "15-minute max timeout — not suitable for long-running jobs"
+              },
+              {
+                "pro": "Pay only when invoked — essentially free for rare DLQ events",
+                "con": "Cold starts can add latency (mitigate with Provisioned Concurrency)"
+              },
+              {
+                "pro": "Auto-scales to zero — no idle cost",
+                "con": "Local filesystem is ephemeral — use /tmp (512MB) or S3 for files"
+              }
+            ]
+          }
+        },
+        {
+          "id": 8,
+          "title": "Testing the System",
+          "icon": "TestTube",
+          "color": "#22c55e",
+          "summary": "Verify each component works and trace a job through the full pipeline.",
+          "content": {
+            "intro": "Test each layer: create a job, watch it flow through SQS to the Worker, verify DynamoDB updates, and test the DLQ failure path.",
+            "whyThis": "End-to-end testing confirms all IAM permissions are correct, services can communicate, and your Redrive Policy works as expected.",
+            "code": "# Replace with your EC2 public IP\nAPI_URL=\"http://$PUBLIC_IP:8080\"\n\n# Test 1: Create a job\ncurl -X POST \"$API_URL/api/v1/jobs\" \\\n  -H \"Content-Type: application/json\" \\\n  -H \"Idempotency-Key: test-$(date +%s)\" \\\n  -d '{\n    \"type\": \"process_document\",\n    \"priority\": \"normal\",\n    \"params\": { \"source\": \"s3://bucket/test.pdf\" }\n  }'\n\n# Test 2: Check job status (use jobId from above)\ncurl \"$API_URL/api/v1/jobs/$JOB_ID\"\n# Expected: PENDING → PROCESSING → SUCCEEDED\n\n# Test 3: Verify in DynamoDB directly\naws dynamodb get-item \\\n    --table-name Jobs \\\n    --key \"{\\\"jobId\\\":{\\\"S\\\":\\\"$JOB_ID\\\"}}\"\n\n# Test 4: Check SQS queue depth\naws sqs get-queue-attributes \\\n    --queue-url \"$QUEUE_URL\" \\\n    --attribute-names ApproximateNumberOfMessages",
+            "verify": "# Watch Worker logs in real-time\naws logs tail /aws/jobsys/svc-worker --follow --region $AWS_REGION",
+            "concepts": [
+              {
+                "title": "Idempotency Key",
+                "text": "The Idempotency-Key header prevents duplicate jobs. If you retry the same request (network timeout), the API returns the existing job instead of creating a new one. DynamoDB's conditional writes enforce this."
+              },
+              {
+                "title": "Status Transitions",
+                "text": "PENDING → PROCESSING → SUCCEEDED (or FAILED). Each transition is a DynamoDB UpdateItem call. The API sets PENDING, Worker sets PROCESSING then SUCCEEDED, Lambda sets FAILED."
+              },
+              {
+                "title": "CloudWatch Logs",
+                "text": "All logs from EC2 containers and Lambda are in CloudWatch. Use 'aws logs tail' for real-time debugging without SSH-ing into instances."
+              }
+            ],
+            "tradeoffs": [
+              {
+                "pro": "Idempotency prevents duplicate processing on retry",
+                "con": "Idempotency keys must be stored — adds DB storage and lookup cost"
+              },
+              {
+                "pro": "Async polling is simple to implement for clients",
+                "con": "Clients must poll for status — consider WebSockets or SNS notifications for real-time UX"
+              },
+              {
+                "pro": "CloudWatch gives centralized logs for all services",
+                "con": "CloudWatch Logs Insights queries cost money — use log levels to filter noise"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "questions": [
+    {
+      "id": "69c81fc6a6f971d3a052eb8b",
+      "project_id": "69c81f9da6f971d3a052eb7f",
+      "question": "Why store Rekognition labels in a JSON column in Aurora rather than normalizing them into separate SQL rows?",
+      "options": [
+        "JSON columns are faster than relational rows for all queries",
+        "Labels vary unpredictably per image — JSON avoids schema migrations when Rekognition adds new label types",
+        "Aurora doesn't support multi-row inserts from Lambda",
+        "Rekognition returns labels in JSON and Aurora cannot parse other formats"
+      ],
+      "correct": 1,
+      "explanation": "Image labels are variable and schema-less — a photo of a dog has different labels than a cityscape. Storing as JSON avoids creating a separate labels table with complex joins, while MySQL's JSON functions still allow querying label content.",
+      "category": "best_practices"
+    },
+    {
+      "id": "69c81fc6a6f971d3a052eb8a",
+      "project_id": "69c81f9da6f971d3a052eb7f",
+      "question": "What is the minimum confidence threshold recommended for Rekognition label detection in production?",
+      "options": [
+        "10% — capture all possible labels",
+        "50% — balanced precision and recall",
+        "75%+ — reduces noise from low-confidence false detections",
+        "99% — only accept near-certain labels"
+      ],
+      "correct": 2,
+      "explanation": "Setting min-confidence to 75+ filters out noisy, low-confidence detections. Below 75%, Rekognition often returns vague or incorrect labels that pollute your metadata database.",
+      "category": "best_practices"
+    },
+    {
+      "id": "69c81fc6a6f971d3a052eb89",
+      "project_id": "69c81f9da6f971d3a052eb7f",
+      "question": "What is a Lambda cold start and when does it occur?",
+      "options": [
+        "When Lambda runs out of memory and restarts",
+        "The initial latency when Lambda spins up a new execution environment after being idle",
+        "Every invocation starts cold — Lambda never reuses environments",
+        "Cold starts only happen with VPC-attached Lambdas"
+      ],
+      "correct": 1,
+      "explanation": "A cold start happens when Lambda needs to initialize a new execution environment (download code, start runtime). Subsequent invocations reuse the warm environment. Use Provisioned Concurrency to eliminate cold starts for latency-sensitive endpoints.",
+      "category": "service_roles"
+    },
+    {
+      "id": "69c81fc6a6f971d3a052eb88",
+      "project_id": "69c81f9da6f971d3a052eb7f",
+      "question": "What is Origin Access Control (OAC) in CloudFront and why is it preferred over the legacy OAI?",
+      "options": [
+        "OAC is a caching policy; OAI is a routing policy",
+        "OAC uses SigV4 signing for stronger security and supports newer S3 features; OAI is legacy and less secure",
+        "OAC is faster because it bypasses S3 authentication",
+        "OAC and OAI are identical — just renamed"
+      ],
+      "correct": 1,
+      "explanation": "OAC replaced OAI as the recommended way for CloudFront to access private S3 buckets. It uses AWS Signature Version 4 (SigV4), supports SSE-KMS encrypted buckets, and is the current AWS best practice.",
+      "category": "service_roles"
+    },
+    {
+      "id": "69c81fc6a6f971d3a052eb87",
+      "project_id": "69c81f9da6f971d3a052eb7f",
+      "question": "Why does Aurora Serverless use the Data API instead of a standard TCP database connection from Lambda?",
+      "options": [
+        "Lambda cannot make TCP connections",
+        "The Data API is faster than TCP for SQL queries",
+        "Lambda functions are stateless and short-lived — managing persistent DB connection pools is wasteful and complex",
+        "Standard DB connections require a VPC which Lambda doesn't support"
+      ],
+      "correct": 2,
+      "explanation": "Traditional DB connections are persistent and stateful. Lambda spins up/down rapidly, making connection pool management a nightmare. The Aurora Data API uses HTTPS — no persistent connection, no VPC required, Lambda-friendly.",
+      "category": "best_practices"
+    },
+    {
+      "id": "69c81fc6a6f971d3a052eb86",
+      "project_id": "69c81f9da6f971d3a052eb7f",
+      "question": "Which IAM principle should govern the Lambda Processor's permissions?",
+      "options": [
+        "Grant AdministratorAccess for simplicity in development",
+        "Grant only the specific S3 paths, Rekognition actions, and RDS cluster needed — nothing more",
+        "Grant full S3 and RDS access since Lambda is internal",
+        "No IAM role needed since Lambda is a managed service"
+      ],
+      "correct": 1,
+      "explanation": "Least privilege means granting only what's needed. The Lambda needs s3:GetObject/PutObject on the specific bucket, rekognition:DetectLabels on *, and rds-data:ExecuteStatement on the specific cluster ARN.",
+      "category": "iam_policy"
+    },
+    {
+      "id": "69c81fc6a6f971d3a052eb85",
+      "project_id": "69c81f9da6f971d3a052eb7f",
+      "question": "What is the relationship between Lambda memory and CPU performance?",
+      "options": [
+        "CPU is always fixed at 1 vCPU regardless of memory",
+        "Higher memory only affects RAM, not processing speed",
+        "Lambda allocates CPU proportionally to memory — more memory = more CPU",
+        "CPU scales based on the number of concurrent invocations"
+      ],
+      "correct": 2,
+      "explanation": "AWS allocates CPU proportionally to memory setting. At 1769MB you get 1 full vCPU. For CPU-intensive tasks like image resizing, increasing memory directly speeds up processing.",
+      "category": "service_roles"
+    },
+    {
+      "id": "69c81fc6a6f971d3a052eb84",
+      "project_id": "69c81f9da6f971d3a052eb7f",
+      "question": "Why should you block all public access on the S3 bucket and use CloudFront instead?",
+      "options": [
+        "S3 public buckets are slower than CloudFront",
+        "CloudFront requires private S3 buckets to function",
+        "Directly public S3 buckets expose you to hotlinking, data leaks, and bypass your CDN caching",
+        "AWS charges extra fees for public S3 buckets"
+      ],
+      "correct": 2,
+      "explanation": "A public S3 bucket lets anyone access your files directly — bypassing CloudFront's caching, costing you more in S3 GET requests, and exposing your data. OAC keeps S3 private while CloudFront serves it securely.",
+      "category": "best_practices"
+    },
+    {
+      "id": "69c81fc6a6f971d3a052eb83",
+      "project_id": "69c81f9da6f971d3a052eb7f",
+      "question": "What AWS mechanism automatically triggers the Lambda Processor when a new image is uploaded to S3?",
+      "options": [
+        "A CloudWatch Events rule polling S3 every minute",
+        "An SQS queue that S3 writes to",
+        "S3 Event Notifications (s3:ObjectCreated:*)",
+        "A CloudFront trigger on the origin"
+      ],
+      "correct": 2,
+      "explanation": "S3 Event Notifications fire instantly when an object is created. You configure a filter (prefix: uploads/) so only original uploads trigger the Lambda, not processed thumbnails.",
+      "category": "service_roles"
+    },
+    {
+      "id": "69c81fc6a6f971d3a052eb82",
+      "project_id": "69c81f9da6f971d3a052eb7f",
+      "question": "Why does the user upload images directly to S3 using a pre-signed URL instead of through the API server?",
+      "options": [
+        "The API server doesn't support file uploads",
+        "It bypasses the API server to reduce latency and avoid routing large files through your compute",
+        "S3 requires direct browser connections by default",
+        "API Gateway has a 1MB payload limit"
+      ],
+      "correct": 1,
+      "explanation": "Pre-signed URLs let the browser upload directly to S3, skipping your API server entirely. This avoids network bottlenecks, reduces API costs, and is faster for the user.",
+      "category": "best_practices"
+    },
+    {
+      "id": "69c817926377b7f65b37474e",
+      "project_id": "69c812524c575e7bb5088f50",
+      "question": "What is the advantage of storing Docker images in AWS ECR over Docker Hub?",
+      "options": [
+        "ECR images run faster than Docker Hub images",
+        "ECR is private, integrated with IAM, and avoids Docker Hub rate limits inside AWS",
+        "ECR supports more programming languages",
+        "Docker Hub does not support multi-stage builds"
+      ],
+      "correct": 1,
+      "explanation": "ECR (Elastic Container Registry) is AWS's private Docker registry. It integrates natively with IAM for access control, eliminates Docker Hub pull rate limits (which can block CI/CD), and keeps images within the AWS network for faster pulls to EC2.",
+      "category": "best_practices"
+    },
+    {
+      "id": "69c817926377b7f65b37474d",
+      "project_id": "69c812524c575e7bb5088f50",
+      "question": "Why is Lambda the right choice for handling Dead Letter Queue (DLQ) messages instead of the Worker?",
+      "options": [
+        "Lambda is always faster than EC2 Workers",
+        "DLQ messages are rare — Lambda's pay-per-execution model avoids running a server 24/7 for rare failure events",
+        "Lambda can access DynamoDB but Workers cannot",
+        "Lambda automatically retries failed messages"
+      ],
+      "correct": 1,
+      "explanation": "The DLQ only receives messages when failures occur — a rare event. Running an EC2 Worker permanently just to handle occasional DLQ messages is wasteful. Lambda runs only when triggered and you pay only for milliseconds of execution. Perfect for infrequent, event-driven tasks.",
+      "category": "best_practices"
+    },
+    {
+      "id": "69c817926377b7f65b37474c",
+      "project_id": "69c812524c575e7bb5088f50",
+      "question": "SQS provides 'at-least-once delivery'. What must Workers implement to handle this safely?",
+      "options": [
+        "Retry logic with exponential backoff",
+        "Idempotency — processing the same message twice must produce the same result",
+        "Message deduplication at the SQS level only",
+        "Circuit breakers on the API side"
+      ],
+      "correct": 1,
+      "explanation": "At-least-once delivery means the same message can be delivered more than once (rare, but possible). Workers must be idempotent: if a job is processed twice, the second processing should not cause duplicate side effects. This is usually handled by checking if the job is already COMPLETED in DynamoDB before processing.",
+      "category": "best_practices"
+    },
+    {
+      "id": "69c817926377b7f65b37474b",
+      "project_id": "69c812524c575e7bb5088f50",
+      "question": "What is the SQS Visibility Timeout and why is it set to 300 seconds?",
+      "options": [
+        "It deletes messages after 5 minutes",
+        "It hides a message from other Workers while one is processing it, preventing duplicate processing",
+        "It limits the message size to 300 KB",
+        "It sets the maximum retry count to 300"
+      ],
+      "correct": 1,
+      "explanation": "When a Worker picks up a message, SQS makes it invisible to other Workers for the Visibility Timeout duration (5 minutes here). If the Worker finishes and deletes the message, great. If not (crash), the message reappears for retry. Set it longer than your longest expected processing time.",
+      "category": "best_practices"
+    },
+    {
+      "id": "69c817926377b7f65b37474a",
+      "project_id": "69c812524c575e7bb5088f50",
+      "question": "What is the 'Principle of Least Privilege' in IAM?",
+      "options": [
+        "Grant all permissions by default and remove as needed",
+        "Grant only the exact permissions required for a task — nothing more",
+        "Use IAM Groups instead of IAM Roles",
+        "Avoid using IAM policies for EC2 instances"
+      ],
+      "correct": 1,
+      "explanation": "Least Privilege means starting with zero permissions and adding only what is strictly necessary. This limits the blast radius if credentials are compromised — an attacker can only perform actions the role explicitly allows.",
+      "category": "iam_policy"
+    },
+    {
+      "id": "69c817926377b7f65b374749",
+      "project_id": "69c812524c575e7bb5088f50",
+      "question": "Why does the API IAM policy include 'ssm:GetParameter' for Parameter Store?",
+      "options": [
+        "To store job results in SSM",
+        "To securely retrieve secrets like DB credentials and queue URLs at runtime instead of hardcoding them",
+        "SSM is required for EC2 health checks",
+        "To trigger Lambda functions via SSM"
+      ],
+      "correct": 1,
+      "explanation": "Hardcoding secrets (DB passwords, queue URLs) in code is a major security risk. AWS Systems Manager Parameter Store allows you to securely store secrets and fetch them at runtime. The policy grants access only to the /jobsys/* path, limiting exposure.",
+      "category": "iam_policy"
+    },
+    {
+      "id": "69c817926377b7f65b374748",
+      "project_id": "69c812524c575e7bb5088f50",
+      "question": "Which IAM statement in the API policy ensures it can only write to the 'Jobs' table and not to other DynamoDB tables?",
+      "options": [
+        "Using Effect: Deny on all other tables",
+        "Specifying the exact ARN arn:aws:dynamodb:*:*:table/Jobs in the Resource field",
+        "Adding a Condition block with TableName=Jobs",
+        "DynamoDB automatically restricts access per region"
+      ],
+      "correct": 1,
+      "explanation": "By specifying the exact table ARN in the Resource field, the policy restricts the API to only that specific table. Wildcards like '*' would grant access to ALL DynamoDB tables in the account — a violation of Least Privilege.",
+      "category": "iam_policy"
+    },
+    {
+      "id": "69c817926377b7f65b374747",
+      "project_id": "69c812524c575e7bb5088f50",
+      "question": "The API Server IAM policy includes 'sqs:SendMessage' but NOT 'sqs:DeleteMessage'. Why?",
+      "options": [
+        "Deleting messages is done automatically by AWS",
+        "The API only sends messages — it never receives or deletes them (Least Privilege)",
+        "SQS does not support DeleteMessage",
+        "DeleteMessage requires a different IAM service"
+      ],
+      "correct": 1,
+      "explanation": "The Principle of Least Privilege means granting only the minimum permissions needed. The API's job is to send a message to SQS — it never reads or deletes messages. Allowing DeleteMessage would be an unnecessary permission that increases risk if the role is compromised.",
+      "category": "iam_policy"
+    },
+    {
+      "id": "69c817926377b7f65b374746",
+      "project_id": "69c812524c575e7bb5088f50",
+      "question": "Why does the Worker run as a separate process from the API Server?",
+      "options": [
+        "The Worker must run on a different cloud region",
+        "Separation allows the Worker to scale independently without touching the API",
+        "AWS does not allow two containers on the same EC2 instance",
+        "The Worker needs a different operating system than the API"
+      ],
+      "correct": 1,
+      "explanation": "By keeping the Worker separate, you can add more Worker instances when job volume is high without scaling the API. Each component has a single responsibility and can be deployed, scaled, and updated independently.",
+      "category": "service_roles"
+    },
+    {
+      "id": "69c817926377b7f65b374745",
+      "project_id": "69c812524c575e7bb5088f50",
+      "question": "What happens to an SQS message after a Worker fails to process it 3 times?",
+      "options": [
+        "It is permanently deleted",
+        "It is sent back to the client",
+        "It is moved to the Dead Letter Queue (DLQ)",
+        "It is retried indefinitely"
+      ],
+      "correct": 2,
+      "explanation": "The Redrive Policy sets maxReceiveCount=3. After 3 failed receive attempts, SQS automatically moves the message to the Dead Letter Queue. This prevents a 'poison-pill' message from blocking other jobs in the main queue.",
+      "category": "service_roles"
+    },
+    {
+      "id": "69c817926377b7f65b374744",
+      "project_id": "69c812524c575e7bb5088f50",
+      "question": "Why is DynamoDB used instead of running MySQL on an EC2 instance?",
+      "options": [
+        "DynamoDB supports complex SQL JOINs",
+        "DynamoDB is fully managed — no server to patch, backup, or scale",
+        "DynamoDB is cheaper in all scenarios",
+        "DynamoDB supports stronger consistency than MySQL"
+      ],
+      "correct": 1,
+      "explanation": "DynamoDB is a managed service — AWS handles replication, backups, patching, and scaling automatically. Running MySQL on EC2 would require you to manage the database server yourself, adding operational overhead.",
+      "category": "service_roles"
+    },
+    {
+      "id": "69c817926377b7f65b374743",
+      "project_id": "69c812524c575e7bb5088f50",
+      "question": "What is the primary role of SQS in this job processing architecture?",
+      "options": [
+        "Store job results permanently",
+        "Decouple the API from the Worker so they scale independently",
+        "Provide real-time push notifications to clients",
+        "Cache API responses"
+      ],
+      "correct": 1,
+      "explanation": "SQS acts as a message buffer between the API and Worker. The API drops a message and returns immediately — it doesn't wait for the job to finish. The Worker picks up messages at its own pace. This decoupling lets each component scale independently.",
+      "category": "service_roles"
+    }
+  ]
+}

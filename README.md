@@ -3,6 +3,11 @@
 Astro site starter with React islands, MDX articles, and Tailwind CSS. Pushes to
 `main` are deployed to GitHub Pages using GitHub Actions.
 
+The Cloud Architect experience at `/cloud-architect/` is a self-contained React
+island with interactive AWS maps, architecture guides, quizzes, and a design
+sandbox. Its sample projects and quiz questions are bundled from the supplied
+Base44 exports; it does not require the Base44 SDK or API.
+
 ## Requirements
 
 - Node.js 22.23.4 or newer
@@ -28,6 +33,7 @@ npm run build
 
 ```text
 src/
+  components/cloud-architect/ Cloud Architect React experience
   components/demos/    React demos rendered as interactive islands
   content/articles/    MDX articles
   layouts/
