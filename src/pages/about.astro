@@ -4,6 +4,7 @@ import SiteLayout from '../layouts/SiteLayout.astro';
 import seceda from '../assets/mountains/seceda.jpg';
 import mountainClouds from '../assets/mountains/mountain-clouds.jpg';
 import mountainTrail from '../assets/mountains/mountain-trail.jpg';
+import { buildRidge, type RidgeOptions } from '../utils/ridges';
 
 const basePath = import.meta.env.BASE_URL.endsWith('/')
   ? import.meta.env.BASE_URL
@@ -61,6 +62,96 @@ const skillGroups = [
     skills: 'מערכות מבוזרות, תכנון API, PostgreSQL, MySQL, MongoDB, BigQuery',
   },
 ];
+
+// ── Alpine skyline: 5 procedurally generated ridges (back → front) ──────────
+// Each layer fades from its crest colour into atmospheric haze at its base,
+// so ranges dissolve into one another like the reference photo.
+type RidgeLayer = RidgeOptions & {
+  id: string;
+  depth: number; // parallax strength: back = small, front = large
+  drift?: 'slow' | 'medium' | 'fast';
+  crest: string;
+  haze: string;
+  hold?: number; // fraction of the gradient that stays at the crest colour
+  mistAfter?: boolean; // add a drifting mist band in front of this layer
+};
+
+const ridgeLayers: RidgeLayer[] = [
+  {
+    id: 'sage',
+    depth: 0.18,
+    drift: 'slow',
+    crest: '#a9b8a3',
+    haze: '#dbe2d3',
+    seed: 11,
+    base: 372,
+    amp: 250,
+    peaks: 5,
+    sharp: 1.05,
+    crag: 0.07,
+    rough: 10,
+  },
+  {
+    id: 'blue',
+    depth: 0.34,
+    drift: 'medium',
+    crest: '#8b9fa3',
+    haze: '#cbd6d0',
+    seed: 47,
+    base: 392,
+    amp: 215,
+    peaks: 6,
+    sharp: 1.15,
+    crag: 0.06,
+    rough: 9,
+    mistAfter: true,
+  },
+  {
+    id: 'forest',
+    depth: 0.55,
+    crest: '#5f7d6c',
+    haze: '#a9bcae',
+    seed: 23,
+    base: 418,
+    amp: 175,
+    peaks: 6,
+    sharp: 1.3,
+    crag: 0.045,
+    rough: 7,
+    mistAfter: true,
+  },
+  {
+    id: 'pine',
+    depth: 0.78,
+    drift: 'fast',
+    crest: '#3a5649',
+    haze: '#7e9889',
+    seed: 91,
+    base: 440,
+    amp: 120,
+    peaks: 7,
+    sharp: 1.9,
+    crag: 0.02,
+    rough: 4,
+    trees: { w: 4, h: 11, gap: 0.7 },
+  },
+  {
+    id: 'night',
+    depth: 1,
+    crest: '#16271f',
+    haze: '#f5f2e9',
+    hold: 0.9,
+    seed: 5,
+    base: 448,
+    amp: 38,
+    peaks: 4,
+    sharp: 1.6,
+    crag: 0.01,
+    rough: 2,
+    trees: { w: 9, h: 70, gap: 1.5, edgeBoost: true },
+  },
+];
+const ridges = ridgeLayers.map((layer) => ({ ...layer, ...buildRidge(layer) }));
 
 const sections = [
   { id: 'intro', label: 'ראשי', index: '01' },
@@ -154,93 +245,38 @@ const sections = [
       </a>
     </section>
 
-    <section aria-label="רכס הרים אלפיני" class="mountain-horizon">
-      <div aria-hidden="true" class="mountain-horizon__atmosphere"></div>
-      <svg
-        aria-hidden="true"
-        class="mountain-horizon__art"
-        preserveAspectRatio="none"
-        viewBox="0 0 1440 420"
-      >
-        <g class="mountain-entry mountain-entry--back">
-          <g class="mountain-scroll-layer" data-depth="0.22">
-            <g class="mountain-drift mountain-drift--slow">
-              <path
-                d="M0 257 48 231 92 244 145 185 184 214 225 157 270 198 317 164 361 205 408 146 455 187 506 117 552 168 603 136 650 194 700 151 744 180 792 111 838 160 891 127 940 186 990 148 1036 202 1081 161 1126 194 1177 124 1222 176 1274 137 1321 180 1373 143 1440 184V420H0Z"
-                fill="#a8b7a4"
-              />
-              <path
-                d="m0 257 48-26 44 13 53-59 39 29 41-57 45 41 47-34 44 41 47-59 47 41 51-70 46 51 51-32 47 58 50-43 44 29 48-69 46 49 53-33 49 59 50-38 46 54 45-41 45 33 51-70 45 52 52-39 47 43 52-37 67 41"
-                fill="none"
-                opacity=".3"
-                stroke="#f5f2e9"
-                stroke-width="2"
-              />
-            </g>
-          </g>
-        </g>
-        <g class="mountain-entry mountain-entry--second">
-          <g class="mountain-scroll-layer" data-depth="0.38">
-            <g class="mountain-drift mountain-drift--medium">
-              <path
-                d="m0 296 55-32 47 20 52-60 43 32 51-84 48 57 42-31 50 42 57-83 50 44 51-27 53 62 54-45 47 28 54-87 52 51 53-33 55 68 48-41 52 50 47-35 45 27 60-74 49 48 54-34 49 51 50-33 59 38v174H0Z"
-                fill="#899b98"
-              />
-              <path
-                d="m0 296 55-32 47 20 52-60 43 32 51-84 48 57 42-31 50 42 57-83 50 44 51-27 53 62 54-45 47 28 54-87 52 51 53-33 55 68 48-41 52 50 47-35 45 27 60-74 49 48 54-34 49 51 50-33 59 38"
-                fill="none"
-                opacity=".27"
-                stroke="#e9eee6"
-                stroke-width="2"
-              />
-            </g>
-          </g>
-        </g>
-        <g class="mountain-entry mountain-entry--middle">
-          <g class="mountain-scroll-layer" data-depth="0.54">
-            <g class="mountain-drift">
-              <path
-                d="m0 326 53-33 52 24 48-38 44 26 48-56 49 34 48-38 48 27 48-72 51 42 45-30 52 49 52-38 50 24 50-61 47 40 56-30 51 54 47-32 49 38 47-29 46 22 54-55 51 35 48-26 52 39 48-30 52 27v161H0Z"
-                fill="#526f61"
-              />
-              <path
-                d="m0 326 53-33 52 24 48-38 44 26 48-56 49 34 48-38 48 27 48-72 51 42 45-30 52 49 52-38 50 24 50-61 47 40 56-30 51 54 47-32 49 38 47-29 46 22 54-55 51 35 48-26 52 39 48-30 52 27"
-                fill="none"
-                opacity=".22"
-                stroke="#d9e2d5"
-                stroke-width="2"
-              />
-            </g>
-          </g>
-        </g>
-        <g class="mountain-entry mountain-entry--front">
-          <g class="mountain-scroll-layer" data-depth="0.76">
-            <g class="mountain-drift mountain-drift--medium">
-              <path
-                d="m0 365 48-24 47 16 53-38 48 21 52-45 48 31 52-27 47 22 53-52 49 32 50-22 52 34 50-30 48 18 53-42 51 31 53-24 49 39 47-26 51 30 48-24 49 19 52-38 48 27 52-22 47 31 51-24 52 19v111H0Z"
-                fill="#344c43"
-              />
-              <path
-                d="m0 365 48-24 47 16 53-38 48 21 52-45 48 31 52-27 47 22 53-52 49 32 50-22 52 34 50-30 48 18 53-42 51 31 53-24 49 39 47-26 51 30 48-24 49 19 52-38 48 27 52-22 47 31 51-24 52 19"
-                fill="none"
-                opacity=".19"
-                stroke="#bccbb7"
-                stroke-width="2"
-              />
-            </g>
-          </g>
-        </g>
-        <g class="mountain-entry mountain-entry--deep">
-          <g class="mountain-scroll-layer" data-depth="1">
-            <g class="mountain-drift">
-              <path
-                d="m0 392 58-19 46 12 51-28 47 17 51-32 49 22 49-20 50 16 51-37 51 23 48-16 51 24 51-21 49 14 51-31 51 21 50-18 50 28 49-19 48 22 50-17 49 13 51-26 50 20 49-15 51 22 47-18 55 15v72H0Z"
-                fill="#14251f"
-              />
-            </g>
-          </g>
-        </g>
-      </svg>
+    <section aria-hidden="true" class="mountain-horizon" data-mountain-horizon>
+      <div class="mountain-horizon__sun"></div>
+      {ridges.map((ridge, index) => (
+        <>
+          <div class="ridge" style={`--depth:${ridge.depth};--i:${index}`}>
+            <svg
+              class:list={['ridge__svg', ridge.drift && `ridge__svg--${ridge.drift}`]}
+              focusable="false"
+              preserveAspectRatio="xMidYMax slice"
+              viewBox="0 0 1600 480"
+            >
+              <defs>
+                <linearGradient
+                  gradientUnits="userSpaceOnUse"
+                  id={`ridge-fill-${ridge.id}`}
+                  x1="0"
+                  x2="0"
+                  y1={Math.round(ridge.minY)}
+                  y2="480"
+                >
+                  <stop offset="0" stop-color={ridge.crest} />
+                  <stop offset={ridge.hold ?? 0.5} stop-color={ridge.crest} />
+                  <stop offset="1" stop-color={ridge.haze} />
+                </linearGradient>
+              </defs>
+              <path d={ridge.d} fill={`url(#ridge-fill-${ridge.id})`} />
+            </svg>
+          </div>
+          {ridge.mistAfter && <div class={`mist mist--${index % 2 ? 'a' : 'b'}`} />}
+        </>
+      ))}
+      <div class="mountain-horizon__fade"></div>
       <div class="mountain-horizon__caption" dir="ltr">
         <span>DOLOMITES · 2,519 M</span>
         <span>ABOVE THE NOISE</span>
@@ -776,73 +812,115 @@ const sections = [
   }
 
   .mountain-horizon {
+    --p: 0;
+    --parallax-range: 56px;
     position: relative;
-    height: clamp(210px, 30vw, 390px);
+    height: clamp(300px, 40vw, 580px);
     margin-top: -1px;
     overflow: hidden;
     isolation: isolate;
-    background: linear-gradient(180deg, #14251f 0%, #65786f 20%, #c4d0c7 63%, var(--snow) 100%);
+    background: linear-gradient(
+      180deg,
+      #14251f 0%,
+      #2e4339 4%,
+      #7e9387 12%,
+      #cfd8cb 26%,
+      #e6eadf 55%,
+      var(--snow) 100%
+    );
   }
 
-  .mountain-horizon__atmosphere {
+  .mountain-horizon__sun {
     position: absolute;
     inset: 0;
-    z-index: -1;
     background:
-      radial-gradient(ellipse at 68% 34%, rgb(245 242 233 / 44%), transparent 31%),
-      radial-gradient(ellipse at 23% 60%, rgb(218 228 219 / 46%), transparent 42%);
+      radial-gradient(ellipse 34% 40% at 72% 34%, rgb(255 251 238 / 62%), transparent 70%),
+      radial-gradient(ellipse 50% 45% at 22% 55%, rgb(224 232 222 / 50%), transparent 70%);
   }
 
-  .mountain-horizon__art {
+  .ridge {
     position: absolute;
     inset: 0;
-    width: 100%;
+    transform: translate3d(0, calc(var(--p) * var(--depth) * var(--parallax-range) * -1), 0);
+    will-change: transform;
+  }
+
+  .ridge__svg {
+    position: absolute;
+    bottom: 0;
+    left: -6%;
+    width: 112%;
     height: 100%;
+    overflow: visible;
+    animation-play-state: paused;
   }
 
-  .mountain-entry {
-    opacity: 1;
+  .ridge__svg--slow {
+    animation: mh-drift 42s ease-in-out infinite alternate;
   }
 
-  .js .mountain-entry {
+  .ridge__svg--medium {
+    animation: mh-drift 32s ease-in-out infinite alternate-reverse;
+  }
+
+  .ridge__svg--fast {
+    animation: mh-drift 26s ease-in-out infinite alternate;
+  }
+
+  .mountain-horizon.is-inview .ridge__svg,
+  .mountain-horizon.is-inview .mist {
+    animation-play-state: running;
+  }
+
+  .mist {
+    position: absolute;
+    left: -20%;
+    width: 140%;
+    height: 36%;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 38% 50% at 30% 50%, rgb(245 242 233 / 55%), transparent 70%),
+      radial-gradient(ellipse 34% 46% at 74% 58%, rgb(245 242 233 / 42%), transparent 70%);
+    animation: mh-mist 48s ease-in-out infinite alternate paused;
+  }
+
+  .mist--a {
+    bottom: 34%;
+  }
+
+  .mist--b {
+    bottom: 15%;
+    animation-direction: alternate-reverse;
+  }
+
+  .mountain-horizon__fade {
+    position: absolute;
+    z-index: 20;
+    inset: auto 0 0;
+    height: 16%;
+    background: linear-gradient(180deg, transparent, var(--snow) 90%);
+    pointer-events: none;
+  }
+
+  .js .ridge,
+  .js .mist {
     opacity: 0;
-    translate: 0 24px;
+    translate: 0 34px;
     transition:
-      opacity 900ms ease,
-      translate 1100ms cubic-bezier(0.2, 0.7, 0.2, 1);
+      opacity 1100ms ease,
+      translate 1500ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition-delay: calc(var(--i, 0) * 110ms);
   }
 
-  .js .mountain-entry.is-visible {
+  .js .mountain-horizon.is-visible .ridge,
+  .js .mountain-horizon.is-visible .mist {
     opacity: 1;
     translate: 0 0;
   }
 
-  .mountain-entry--second {
-    transition-delay: 90ms;
-  }
-
-  .mountain-entry--middle {
-    transition-delay: 170ms;
-  }
-
-  .mountain-entry--front {
-    transition-delay: 250ms;
-  }
-
-  .mountain-entry--deep {
-    transition-delay: 330ms;
-  }
-
-  .mountain-drift--slow {
-    animation: ridge-drift 28s ease-in-out infinite alternate;
-  }
-
-  .mountain-drift--medium {
-    animation: ridge-drift 21s ease-in-out infinite alternate-reverse;
-  }
-
   .mountain-horizon__caption {
     position: absolute;
+    z-index: 30;
     right: max(1.25rem, calc((100vw - 1200px) / 2));
     bottom: 1rem;
     left: max(1.25rem, calc((100vw - 1200px) / 2));
@@ -1396,13 +1474,23 @@ const sections = [
     }
   }
 
-  @keyframes ridge-drift {
+  @keyframes mh-drift {
     from {
-      translate: -5px 0;
+      transform: translate3d(-2.2%, 0, 0);
     }
 
     to {
-      translate: 5px 0;
+      transform: translate3d(2.2%, 0, 0);
+    }
+  }
+
+  @keyframes mh-mist {
+    from {
+      transform: translate3d(-7%, 0, 0);
+    }
+
+    to {
+      transform: translate3d(7%, 0, 0);
     }
   }
 
@@ -1465,7 +1553,8 @@ const sections = [
 
   @media (max-width: 700px) {
     .mountain-horizon {
-      height: clamp(190px, 48vw, 280px);
+      --parallax-range: 34px;
+      height: clamp(260px, 72vw, 360px);
     }
 
     .mountain-horizon__caption {
@@ -1657,14 +1746,20 @@ const sections = [
       transform: none;
     }
 
-    .js .mountain-entry {
+    .js .ridge,
+    .js .mist {
       opacity: 1;
       translate: none;
     }
 
-    .mountain-drift--slow,
-    .mountain-drift--medium {
-      animation: none;
+    .ridge {
+      transform: none;
+      will-change: auto;
+    }
+
+    .ridge__svg,
+    .mist {
+      animation: none !important;
     }
   }
 </style>
@@ -1674,10 +1769,8 @@ const sections = [
   const sections = [...document.querySelectorAll<HTMLElement>('[data-about-section]')];
   const navLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-section-link]')];
   const heroImage = document.querySelector<HTMLElement>('.about-hero__image');
-  const mountainHorizon = document.querySelector<HTMLElement>('.mountain-horizon');
-  const mountainLayers = [
-    ...document.querySelectorAll<SVGGElement>('.mountain-scroll-layer[data-depth]'),
-  ];
+  const mountainHorizon = document.querySelector<HTMLElement>('[data-mountain-horizon]');
+  let horizonInView = false;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   document.documentElement.classList.add('js');
@@ -1692,20 +1785,26 @@ const sections = [
       heroImage.style.setProperty('--hero-parallax', `${shift}px`);
     }
 
-    if (!reducedMotion && mountainHorizon) {
+    if (!reducedMotion && mountainHorizon && horizonInView) {
+      // -1 when the skyline enters from below, +1 when it leaves at the top.
       const bounds = mountainHorizon.getBoundingClientRect();
-      const progress = (window.innerHeight - bounds.top) / (window.innerHeight + bounds.height);
-      const parallax = Math.max(-0.5, Math.min(0.5, progress - 0.5));
-      mountainLayers.forEach((layer) => {
-        const depth = Number(layer.dataset.depth);
-        const shiftPx = parallax * depth * 44;
-        const shiftViewBox = shiftPx * (420 / bounds.height);
-        layer.setAttribute('transform', `translate(0 ${shiftViewBox.toFixed(2)})`);
-      });
+      const raw = (window.innerHeight - bounds.top) / (window.innerHeight + bounds.height);
+      const p = Math.min(1, Math.max(0, raw)) * 2 - 1;
+      mountainHorizon.style.setProperty('--p', p.toFixed(3));
     }
   };
 
-  window.addEventListener('scroll', updateScrollEffects, { passive: true });
+  let scrollTicking = false;
+  const onScroll = () => {
+    if (scrollTicking) return;
+    scrollTicking = true;
+    requestAnimationFrame(() => {
+      scrollTicking = false;
+      updateScrollEffects();
+    });
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', updateScrollEffects);
   updateScrollEffects();
 
@@ -1720,9 +1819,19 @@ const sections = [
       },
       { threshold: 0.12 },
     );
-    document
-      .querySelectorAll('.reveal, .mountain-entry')
-      .forEach((item) => revealObserver.observe(item));
+    document.querySelectorAll('.reveal').forEach((item) => revealObserver.observe(item));
+
+    if (mountainHorizon) {
+      new IntersectionObserver(
+        ([entry]) => {
+          horizonInView = entry.isIntersecting;
+          mountainHorizon.classList.toggle('is-inview', horizonInView);
+          if (entry.intersectionRatio >= 0.15) mountainHorizon.classList.add('is-visible');
+          updateScrollEffects();
+        },
+        { threshold: [0, 0.15] },
+      ).observe(mountainHorizon);
+    }
 
     const sectionObserver = new IntersectionObserver(
       (entries) => {
@@ -1741,8 +1850,9 @@ const sections = [
     );
     sections.forEach((section) => sectionObserver.observe(section));
   } else {
+    horizonInView = true;
     document
-      .querySelectorAll('.reveal, .mountain-entry')
+      .querySelectorAll('.reveal, [data-mountain-horizon]')
       .forEach((item) => item.classList.add('is-visible'));
   }
 </script>
