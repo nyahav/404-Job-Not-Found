@@ -1,0 +1,190 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+
+const basePath = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+
+const experience = [
+  {
+    role: 'מהנדס תוכנה',
+    company: 'PTBox',
+    period: 'יוני 2025 – היום',
+    highlights: [
+      'תכנון שירות תזמור מרכזי שהגדיל את תפוקת הכלים פי 3 והפחית את זמן התזמון מ־200 ל־5 מילישניות, באמצעות מתזמן משוקלל ומטמון בזיכרון.',
+      'הפחתת קריסות OOM של קונטיינרים בכ־90% באמצעות בקרת קבלה היברידית, תעדוף משימות ומנגנון התאוששות מבוסס Docker.',
+      'הובלת מעבר ממערכת SQL ותיקה לארכיטקטורת SQL/NoSQL היברידית, ושילוב אימות משתמשים אחוד מבוסס Keycloak בשירותי Python ו־Kotlin.',
+    ],
+  },
+  {
+    role: 'מהנדס תמיכה',
+    company: 'Base44',
+    period: 'פברואר 2025 – יוני 2025',
+    highlights: [
+      'אבחון תקלות API ואינטגרציה ב־React וב־JavaScript, איתור גורמי שורש והעברת ממצאים הניתנים לשחזור.',
+    ],
+  },
+  {
+    role: 'אנליסט נתונים',
+    company: 'HR Signal',
+    period: 'יוני 2024 – פברואר 2025',
+    highlights: [
+      'ניתוח נתונים ב־BigQuery ובניית אוטומציות סטטיסטיות ב־Python, שהפחיתו ב־15% את עבודת הדיווח הידנית החוזרת.',
+    ],
+  },
+  {
+    role: 'מהנדס NOC',
+    company: 'Check Point Software',
+    period: 'דצמבר 2022 – פברואר 2024',
+    highlights: ['פתרון תקלות Linux ורשתות ושיפור תהליך ההטמעה, שקיצר את זמן האינטגרציה ב־30%.'],
+  },
+];
+
+const skillGroups = [
+  {
+    title: 'שפות ופיתוח',
+    skills: 'Python, FastAPI, Java, Kotlin, JavaScript, TypeScript, React',
+  },
+  {
+    title: 'תשתיות וענן',
+    skills: 'Docker, Kubernetes, RabbitMQ, AWS, GCP, Helm, Terraform, GitHub Actions',
+  },
+  {
+    title: 'מערכות ונתונים',
+    skills: 'מערכות מבוזרות, תכנון API, PostgreSQL, MySQL, MongoDB, BigQuery',
+  },
+];
+---
+
+<SiteLayout
+  title="אודות | יהב ניר"
+  description="מהנדס תוכנה המתמחה במערכות מבוזרות, שירותי Backend ואמינות מערכות."
+  lang="he"
+  dir="rtl"
+  aboutLabel="עליי"
+  articlesLabel="מאמרים"
+>
+  <div class="mx-auto max-w-3xl text-right">
+    <section class="rounded-3xl border border-slate-800 bg-slate-900/70 p-7 sm:p-10">
+      <p class="text-sm font-medium tracking-[0.2em] text-cyan-300 uppercase">נעים להכיר</p>
+      <h1 class="mt-4 text-4xl font-bold tracking-tight text-white sm:text-5xl">יהב ניר</h1>
+      <p class="mt-3 text-xl text-slate-300">מהנדס תוכנה | מערכות Backend ומערכות מבוזרות</p>
+      <p class="mt-6 max-w-2xl text-lg leading-9 text-slate-300">
+        אני מהנדס תוכנה עם ניסיון בבניית שירותי Backend, שיפור אמינות מערכות ועבודה עם מערכות
+        מבוזרות. אני נהנה לפתור בעיות מורכבות, לשפר ביצועים ולבנות שירותים יציבים שאפשר לסמוך עליהם.
+      </p>
+      <div class="mt-8 flex flex-wrap items-center gap-4">
+        <a
+          class="inline-flex items-center gap-2 rounded-full bg-cyan-400 px-5 py-3 font-semibold text-slate-950 transition hover:bg-cyan-300"
+          href={`${basePath}Yahav-Nir-Resume.pdf`}
+          download="Yahav-Nir-Resume.pdf"
+        >
+          <svg
+            aria-hidden="true"
+            class="size-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="1.8"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 3.75v10.5m0 0 4.5-4.5m-4.5 4.5-4.5-4.5M4.5 16.5v2.25A1.5 1.5 0 0 0 6 20.25h12a1.5 1.5 0 0 0 1.5-1.5V16.5"
+            />
+          </svg>
+          להורדת קורות החיים (PDF)
+        </a>
+        <a
+          aria-label="פרופיל LinkedIn של יהב ניר"
+          class="inline-flex items-center gap-2 rounded-full border border-slate-700 px-5 py-3 font-semibold text-white transition hover:border-cyan-400 hover:text-cyan-300"
+          href="https://www.linkedin.com/in/nir-yahav/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <svg aria-hidden="true" class="size-5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.35V9h3.414v1.561h.049c.476-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zM6.856 20.452H3.818V9h3.038v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+          </svg>
+          לפרופיל LinkedIn
+        </a>
+      </div>
+      <p class="mt-6 text-sm text-slate-400">
+        תל אביב ·{' '}
+        <a class="hover:text-cyan-300" href="mailto:yahavnirr@gmail.com" dir="ltr">
+          yahavnirr@gmail.com
+        </a>
+      </p>
+    </section>
+
+    <section class="mt-16">
+      <p class="text-sm font-medium tracking-[0.2em] text-cyan-300 uppercase">ניסיון</p>
+      <h2 class="mt-2 text-3xl font-semibold text-white">ניסיון מקצועי</h2>
+      <div class="mt-8 space-y-5">
+        {experience.map((job) => (
+          <article class="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+            <div class="flex flex-wrap items-baseline justify-between gap-2">
+              <h3 class="text-xl font-semibold text-white">
+                {job.role} <span class="text-cyan-300">@ {job.company}</span>
+              </h3>
+              <p class="text-sm text-slate-400">{job.period}</p>
+            </div>
+            <ul class="mt-4 space-y-3 text-slate-300">
+              {job.highlights.map((highlight) => (
+                <li class="flex gap-3 leading-8">
+                  <span
+                    class="mt-3 size-1.5 shrink-0 rounded-full bg-cyan-400"
+                    aria-hidden="true"
+                  />
+                  <span>{highlight}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="mt-16">
+      <p class="text-sm font-medium tracking-[0.2em] text-cyan-300 uppercase">טכנולוגיות</p>
+      <h2 class="mt-2 text-3xl font-semibold text-white">כלים ותחומי התמחות</h2>
+      <div class="mt-8 grid gap-4 sm:grid-cols-2">
+        {skillGroups.map((group) => (
+          <article class="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+            <h3 class="font-semibold text-white">{group.title}</h3>
+            <p class="mt-3 leading-7 text-slate-300" dir="ltr">
+              {group.skills}
+            </p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section class="mt-16">
+      <p class="text-sm font-medium tracking-[0.2em] text-cyan-300 uppercase">פרויקט נבחר</p>
+      <h2 class="mt-2 text-3xl font-semibold text-white">פלטפורמת תמיכת לקוחות מבוססת AI</h2>
+      <article class="mt-8 rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+        <p class="leading-8 text-slate-300">
+          בניית תהליך עבודה מרובה סוכנים עם LangGraph,‏ FastAPI ו־Amazon Bedrock, הכולל RAG מודע
+          להקשר, ניתוח סנטימנט, ניתוב לפי רמת ביטחון והעברה לאיש צוות בעת הצורך באמצעות SageMaker
+          A2I. הפרויקט כולל גם פריסה מקומית ב־Kubernetes, ניטור ב־Prometheus וב־Grafana ותשתית AWS
+          EKS המנוהלת באמצעות Terraform.
+        </p>
+      </article>
+    </section>
+
+    <section class="mt-16 grid gap-5 sm:grid-cols-2">
+      <article class="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+        <p class="text-sm font-medium tracking-[0.2em] text-cyan-300 uppercase">השכלה</p>
+        <h2 class="mt-3 text-xl font-semibold text-white">תואר ראשון במדעי המחשב</h2>
+        <p class="mt-2 leading-7 text-slate-300">האוניברסיטה הפתוחה · 2020–2024</p>
+      </article>
+      <article class="rounded-2xl border border-slate-800 bg-slate-900/60 p-6">
+        <p class="text-sm font-medium tracking-[0.2em] text-cyan-300 uppercase">שירות צבאי</p>
+        <h2 class="mt-3 text-xl font-semibold text-white">לוחם וחובש קרבי</h2>
+        <p class="mt-2 leading-7 text-slate-300">
+          פלס״ר 7. הכשרת חיילים למצבי לחץ ופיתוח עבודת צוות, אחריות ויכולת הסתגלות.
+        </p>
+      </article>
+    </section>
+  </div>
+</SiteLayout>

@@ -31,13 +31,17 @@ src/
   components/demos/    React demos rendered as interactive islands
   content/articles/    MDX articles
   layouts/
-  pages/
+  pages/               Includes the Hebrew, RTL About page
   styles/
+public/
+  Yahav-Nir-Resume.pdf
 .github/workflows/     GitHub Pages deployment
 ```
 
 Add articles as `.mdx` files under `src/content/articles/`. The article
 collection validates each article's title, publication date, and description.
+The Hebrew About page at `/about/` includes a downloadable PDF resume and a link
+to LinkedIn.
 
 ## GitHub Pages
 

@@ -2,18 +2,29 @@
 interface Props {
   title: string;
   description: string;
+  lang?: string;
+  dir?: 'ltr' | 'rtl';
+  aboutLabel?: string;
+  articlesLabel?: string;
 }
 
 import '../styles/global.css';
 
-const { title, description } = Astro.props;
+const {
+  title,
+  description,
+  lang = 'en',
+  dir = 'ltr',
+  aboutLabel = 'About me',
+  articlesLabel = 'Articles',
+} = Astro.props;
 const basePath = import.meta.env.BASE_URL.endsWith('/')
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang} dir={dir}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
@@ -28,19 +39,29 @@ const basePath = import.meta.env.BASE_URL.endsWith('/')
         <a class="font-semibold tracking-tight text-white" href={basePath}>
           404 <span class="text-cyan-400">/</span> Job Not Found
         </a>
-        <a
-          class="text-sm text-slate-300 transition hover:text-cyan-300"
-          href={`${basePath}#articles`}
-        >
-          Articles
-        </a>
+        <div class="flex items-center gap-6">
+          <a
+            class="text-sm text-slate-300 transition hover:text-cyan-300"
+            href={`${basePath}about/`}
+          >
+            {aboutLabel}
+          </a>
+          <a
+            class="text-sm text-slate-300 transition hover:text-cyan-300"
+            href={`${basePath}#articles`}
+          >
+            {articlesLabel}
+          </a>
+        </div>
       </nav>
     </header>
     <main class="mx-auto max-w-5xl px-6 py-16 sm:py-24">
       <slot />
     </main>
     <footer class="border-t border-slate-800 px-6 py-8 text-center text-sm text-slate-500">
-      Built with Astro, React, MDX, and Tailwind CSS.
+      {lang === 'he'
+        ? 'נבנה עם Astro, React, MDX ו־Tailwind CSS.'
+        : 'Built with Astro, React, MDX, and Tailwind CSS.'}
     </footer>
   </body>
 </html>
