@@ -175,7 +175,11 @@ export default function TutorialDialog({ open, onClose }: Props) {
                   <input
                     checked={skipForSession}
                     className="mt-1 accent-cyan-400"
-                    onChange={(event) => setSkipForSession(event.target.checked)}
+                    onChange={(event) => {
+                      const checked = event.target.checked;
+                      setSkipForSession(checked);
+                      if (checked) onClose(true);
+                    }}
                     type="checkbox"
                   />
                   <span>Don’t need the tutorial — hide it for this browser session</span>

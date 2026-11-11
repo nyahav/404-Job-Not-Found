@@ -15,6 +15,11 @@ The 3 AM incident-response lab at `/3-am/` is a playable, client-side incident
 simulation. Its first scenario teaches cache-stampede investigation, diagnosis,
 mitigation, replay, and post-mortem scoring without a server or external API.
 
+## Brand color
+
+The logo purple is `#7928CA` (RGB `121, 40, 202`), available as the
+`--color-logo` CSS custom property.
+
 ## Requirements
 
 - Node.js 22.23.4 or newer
