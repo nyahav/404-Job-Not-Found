@@ -86,9 +86,6 @@ const sections = [
     <div aria-hidden="true" class="about-progress"></div>
 
     <nav aria-label="ניווט בעמוד" class="about-rail">
-      <a aria-label="חזרה לראש העמוד" class="about-rail__mark" href="#intro">
-        י׳נ
-      </a>
       <div class="about-rail__links">
         {sections.map((section) => (
           <a
@@ -102,9 +99,6 @@ const sections = [
           </a>
         ))}
       </div>
-      <span aria-hidden="true" class="about-rail__end">
-        עמוד אישי
-      </span>
     </nav>
 
     <section
@@ -158,6 +152,99 @@ const sections = [
         <span>לגלול ולגלות</span>
         <span aria-hidden="true" class="scroll-cue__line"></span>
       </a>
+    </section>
+
+    <section aria-label="רכס הרים אלפיני" class="mountain-horizon">
+      <div aria-hidden="true" class="mountain-horizon__atmosphere"></div>
+      <svg
+        aria-hidden="true"
+        class="mountain-horizon__art"
+        preserveAspectRatio="none"
+        viewBox="0 0 1440 420"
+      >
+        <g class="mountain-entry mountain-entry--back">
+          <g class="mountain-scroll-layer" data-depth="0.22">
+            <g class="mountain-drift mountain-drift--slow">
+              <path
+                d="M0 257 48 231 92 244 145 185 184 214 225 157 270 198 317 164 361 205 408 146 455 187 506 117 552 168 603 136 650 194 700 151 744 180 792 111 838 160 891 127 940 186 990 148 1036 202 1081 161 1126 194 1177 124 1222 176 1274 137 1321 180 1373 143 1440 184V420H0Z"
+                fill="#a8b7a4"
+              />
+              <path
+                d="m0 257 48-26 44 13 53-59 39 29 41-57 45 41 47-34 44 41 47-59 47 41 51-70 46 51 51-32 47 58 50-43 44 29 48-69 46 49 53-33 49 59 50-38 46 54 45-41 45 33 51-70 45 52 52-39 47 43 52-37 67 41"
+                fill="none"
+                opacity=".3"
+                stroke="#f5f2e9"
+                stroke-width="2"
+              />
+            </g>
+          </g>
+        </g>
+        <g class="mountain-entry mountain-entry--second">
+          <g class="mountain-scroll-layer" data-depth="0.38">
+            <g class="mountain-drift mountain-drift--medium">
+              <path
+                d="m0 296 55-32 47 20 52-60 43 32 51-84 48 57 42-31 50 42 57-83 50 44 51-27 53 62 54-45 47 28 54-87 52 51 53-33 55 68 48-41 52 50 47-35 45 27 60-74 49 48 54-34 49 51 50-33 59 38v174H0Z"
+                fill="#899b98"
+              />
+              <path
+                d="m0 296 55-32 47 20 52-60 43 32 51-84 48 57 42-31 50 42 57-83 50 44 51-27 53 62 54-45 47 28 54-87 52 51 53-33 55 68 48-41 52 50 47-35 45 27 60-74 49 48 54-34 49 51 50-33 59 38"
+                fill="none"
+                opacity=".27"
+                stroke="#e9eee6"
+                stroke-width="2"
+              />
+            </g>
+          </g>
+        </g>
+        <g class="mountain-entry mountain-entry--middle">
+          <g class="mountain-scroll-layer" data-depth="0.54">
+            <g class="mountain-drift">
+              <path
+                d="m0 326 53-33 52 24 48-38 44 26 48-56 49 34 48-38 48 27 48-72 51 42 45-30 52 49 52-38 50 24 50-61 47 40 56-30 51 54 47-32 49 38 47-29 46 22 54-55 51 35 48-26 52 39 48-30 52 27v161H0Z"
+                fill="#526f61"
+              />
+              <path
+                d="m0 326 53-33 52 24 48-38 44 26 48-56 49 34 48-38 48 27 48-72 51 42 45-30 52 49 52-38 50 24 50-61 47 40 56-30 51 54 47-32 49 38 47-29 46 22 54-55 51 35 48-26 52 39 48-30 52 27"
+                fill="none"
+                opacity=".22"
+                stroke="#d9e2d5"
+                stroke-width="2"
+              />
+            </g>
+          </g>
+        </g>
+        <g class="mountain-entry mountain-entry--front">
+          <g class="mountain-scroll-layer" data-depth="0.76">
+            <g class="mountain-drift mountain-drift--medium">
+              <path
+                d="m0 365 48-24 47 16 53-38 48 21 52-45 48 31 52-27 47 22 53-52 49 32 50-22 52 34 50-30 48 18 53-42 51 31 53-24 49 39 47-26 51 30 48-24 49 19 52-38 48 27 52-22 47 31 51-24 52 19v111H0Z"
+                fill="#344c43"
+              />
+              <path
+                d="m0 365 48-24 47 16 53-38 48 21 52-45 48 31 52-27 47 22 53-52 49 32 50-22 52 34 50-30 48 18 53-42 51 31 53-24 49 39 47-26 51 30 48-24 49 19 52-38 48 27 52-22 47 31 51-24 52 19"
+                fill="none"
+                opacity=".19"
+                stroke="#bccbb7"
+                stroke-width="2"
+              />
+            </g>
+          </g>
+        </g>
+        <g class="mountain-entry mountain-entry--deep">
+          <g class="mountain-scroll-layer" data-depth="1">
+            <g class="mountain-drift">
+              <path
+                d="m0 392 58-19 46 12 51-28 47 17 51-32 49 22 49-20 50 16 51-37 51 23 48-16 51 24 51-21 49 14 51-31 51 21 50-18 50 28 49-19 48 22 50-17 49 13 51-26 50 20 49-15 51 22 47-18 55 15v72H0Z"
+                fill="#14251f"
+              />
+            </g>
+          </g>
+        </g>
+      </svg>
+      <div class="mountain-horizon__caption" dir="ltr">
+        <span>DOLOMITES · 2,519 M</span>
+        <span>ABOVE THE NOISE</span>
+      </div>
     </section>
 
     <section
@@ -431,12 +518,6 @@ const sections = [
     padding: 0;
   }
 
-  :global(body.alpine-site > footer) {
-    border-color: rgb(245 242 233 / 12%);
-    background: #14251f;
-    color: #9ead9c;
-  }
-
   .alpine-page {
     --forest: #14251f;
     --pine: #344c43;
@@ -476,18 +557,6 @@ const sections = [
     mix-blend-mode: difference;
   }
 
-  .about-rail__mark {
-    display: grid;
-    width: 2.45rem;
-    height: 2.45rem;
-    place-items: center;
-    border: 1px solid currentColor;
-    border-radius: 50%;
-    font-family: Georgia, serif;
-    font-size: 0.78rem;
-    text-decoration: none;
-  }
-
   .about-rail__links {
     display: flex;
     flex-direction: column;
@@ -525,16 +594,9 @@ const sections = [
     color: var(--forest);
   }
 
-  .about-rail__label,
-  .about-rail__end {
+  .about-rail__label {
     font-size: 0.65rem;
     white-space: nowrap;
-  }
-
-  .about-rail__end {
-    writing-mode: vertical-rl;
-    letter-spacing: 0.16em;
-    opacity: 0.65;
   }
 
   .about-hero {
@@ -711,6 +773,84 @@ const sections = [
     height: 1px;
     background: currentColor;
     animation: breathe 1.8s ease-in-out infinite;
+  }
+
+  .mountain-horizon {
+    position: relative;
+    height: clamp(210px, 30vw, 390px);
+    margin-top: -1px;
+    overflow: hidden;
+    isolation: isolate;
+    background: linear-gradient(180deg, #14251f 0%, #65786f 20%, #c4d0c7 63%, var(--snow) 100%);
+  }
+
+  .mountain-horizon__atmosphere {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(ellipse at 68% 34%, rgb(245 242 233 / 44%), transparent 31%),
+      radial-gradient(ellipse at 23% 60%, rgb(218 228 219 / 46%), transparent 42%);
+  }
+
+  .mountain-horizon__art {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .mountain-entry {
+    opacity: 1;
+  }
+
+  .js .mountain-entry {
+    opacity: 0;
+    translate: 0 24px;
+    transition:
+      opacity 900ms ease,
+      translate 1100ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .js .mountain-entry.is-visible {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .mountain-entry--second {
+    transition-delay: 90ms;
+  }
+
+  .mountain-entry--middle {
+    transition-delay: 170ms;
+  }
+
+  .mountain-entry--front {
+    transition-delay: 250ms;
+  }
+
+  .mountain-entry--deep {
+    transition-delay: 330ms;
+  }
+
+  .mountain-drift--slow {
+    animation: ridge-drift 28s ease-in-out infinite alternate;
+  }
+
+  .mountain-drift--medium {
+    animation: ridge-drift 21s ease-in-out infinite alternate-reverse;
+  }
+
+  .mountain-horizon__caption {
+    position: absolute;
+    right: max(1.25rem, calc((100vw - 1200px) / 2));
+    bottom: 1rem;
+    left: max(1.25rem, calc((100vw - 1200px) / 2));
+    display: flex;
+    justify-content: space-between;
+    color: #53665b;
+    font: 0.58rem/1 monospace;
+    letter-spacing: 0.13em;
   }
 
   .section-shell {
@@ -1256,6 +1396,16 @@ const sections = [
     }
   }
 
+  @keyframes ridge-drift {
+    from {
+      translate: -5px 0;
+    }
+
+    to {
+      translate: 5px 0;
+    }
+  }
+
   @media (max-width: 900px) {
     .about-rail {
       top: auto;
@@ -1274,11 +1424,6 @@ const sections = [
       mix-blend-mode: normal;
       transform: translateX(50%);
       backdrop-filter: blur(12px);
-    }
-
-    .about-rail__mark,
-    .about-rail__end {
-      display: none;
     }
 
     .about-rail__links {
@@ -1319,6 +1464,15 @@ const sections = [
   }
 
   @media (max-width: 700px) {
+    .mountain-horizon {
+      height: clamp(190px, 48vw, 280px);
+    }
+
+    .mountain-horizon__caption {
+      bottom: 0.75rem;
+      font-size: 0.48rem;
+    }
+
     .about-hero {
       min-height: min(790px, calc(100svh - 108px));
       min-height: max(610px, calc(100svh - 108px));
@@ -1502,6 +1656,16 @@ const sections = [
       opacity: 1;
       transform: none;
     }
+
+    .js .mountain-entry {
+      opacity: 1;
+      translate: none;
+    }
+
+    .mountain-drift--slow,
+    .mountain-drift--medium {
+      animation: none;
+    }
   }
 </style>
 
@@ -1510,6 +1674,10 @@ const sections = [
   const sections = [...document.querySelectorAll<HTMLElement>('[data-about-section]')];
   const navLinks = [...document.querySelectorAll<HTMLAnchorElement>('[data-section-link]')];
   const heroImage = document.querySelector<HTMLElement>('.about-hero__image');
+  const mountainHorizon = document.querySelector<HTMLElement>('.mountain-horizon');
+  const mountainLayers = [
+    ...document.querySelectorAll<SVGGElement>('.mountain-scroll-layer[data-depth]'),
+  ];
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   document.documentElement.classList.add('js');
@@ -1522,6 +1690,18 @@ const sections = [
     if (!reducedMotion && heroImage) {
       const shift = Math.min(window.scrollY * 0.12, 72);
       heroImage.style.setProperty('--hero-parallax', `${shift}px`);
+    }
+
+    if (!reducedMotion && mountainHorizon) {
+      const bounds = mountainHorizon.getBoundingClientRect();
+      const progress = (window.innerHeight - bounds.top) / (window.innerHeight + bounds.height);
+      const parallax = Math.max(-0.5, Math.min(0.5, progress - 0.5));
+      mountainLayers.forEach((layer) => {
+        const depth = Number(layer.dataset.depth);
+        const shiftPx = parallax * depth * 44;
+        const shiftViewBox = shiftPx * (420 / bounds.height);
+        layer.setAttribute('transform', `translate(0 ${shiftViewBox.toFixed(2)})`);
+      });
     }
   };
 
@@ -1540,7 +1720,9 @@ const sections = [
       },
       { threshold: 0.12 },
     );
-    document.querySelectorAll('.reveal').forEach((item) => revealObserver.observe(item));
+    document
+      .querySelectorAll('.reveal, .mountain-entry')
+      .forEach((item) => revealObserver.observe(item));
 
     const sectionObserver = new IntersectionObserver(
       (entries) => {
@@ -1559,6 +1741,8 @@ const sections = [
     );
     sections.forEach((section) => sectionObserver.observe(section));
   } else {
-    document.querySelectorAll('.reveal').forEach((item) => item.classList.add('is-visible'));
+    document
+      .querySelectorAll('.reveal, .mountain-entry')
+      .forEach((item) => item.classList.add('is-visible'));
   }
 </script>
