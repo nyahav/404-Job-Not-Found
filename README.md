@@ -11,6 +11,10 @@ Base44 exports; it does not require the Base44 SDK or API.
 The Database Explorer at `/database-explorer/` contains interactive lessons for
 B-Tree page splits, LSM compaction, WAL recovery, MVCC isolation, and query plans.
 
+The 3 AM incident-response lab at `/3-am/` is a playable, client-side incident
+simulation. Its first scenario teaches cache-stampede investigation, diagnosis,
+mitigation, replay, and post-mortem scoring without a server or external API.
+
 ## Requirements
 
 - Node.js 22.23.4 or newer
@@ -37,6 +41,7 @@ npm run build
 ```text
 src/
   components/cloud-architect/ Cloud Architect React experience
+  components/three-am/ 3 AM incident-response game
   components/demos/    React demos rendered as interactive islands
   content/articles/    MDX articles
   layouts/
