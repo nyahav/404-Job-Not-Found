@@ -1,4 +1,4 @@
-import { animate, inView, scroll } from 'motion';
+import { animate, inView } from 'motion';
 
 type Cleanup = () => void;
 
@@ -77,24 +77,31 @@ const initializeReveals = (page: HTMLElement) => {
   });
 };
 
-const initializeRoute = (page: HTMLElement) => {
+const initializeRoute = (page: HTMLElement, reducedMotion: boolean) => {
   const route = page.querySelector<HTMLElement>('[data-route]');
   const line = route?.querySelector<SVGPathElement>('[data-route-line]');
   const map = route?.querySelector<SVGSVGElement>('.ascent-route__map');
   if (!route || !line || !map) return;
 
   const stops = Array.from(route.querySelectorAll<HTMLElement>('[data-route-stop]'));
-  const pathLength = line.getTotalLength();
   const viewBoxHeight = map.viewBox.baseVal.height;
   const markerDistances = new Map<HTMLElement, number>();
+  const markerPositions = new Map<HTMLElement, DOMPoint>();
+  const pathLayers = Array.from(
+    route.querySelectorAll<SVGPathElement>(
+      '[data-route-line], .ascent-route__shadow, [data-route-pulse-trail], [data-route-pulse]',
+    ),
+  );
   const pulseTrail = route.querySelector<SVGPathElement>('[data-route-pulse-trail]');
   const pulse = route.querySelector<SVGPathElement>('[data-route-pulse]');
   let routeTop = 0;
   let routeHeight = 0;
+  let pathLength = 0;
+  let firstStopY = 0;
   let finalStopY = viewBoxHeight;
   let frame = 0;
 
-  if (pathLength <= 0 || viewBoxHeight <= 0 || stops.length === 0) return;
+  if (viewBoxHeight <= 0 || stops.length === 0) return;
 
   const pathLengthAtY = (targetY: number) => {
     let low = 0;
@@ -109,7 +116,7 @@ const initializeRoute = (page: HTMLElement) => {
     return (low + high) / 2;
   };
 
-  const markerY = (stopElement: HTMLElement) => {
+  const markerPosition = (stopElement: HTMLElement) => {
     const marker = stopElement.querySelector<HTMLElement>('.ascent-stop__marker');
     const matrix = map.getScreenCTM();
     if (!marker || !matrix) return undefined;
@@ -118,7 +125,7 @@ const initializeRoute = (page: HTMLElement) => {
     const point = map.createSVGPoint();
     point.x = bounds.left + bounds.width / 2;
     point.y = bounds.top + bounds.height / 2;
-    return point.matrixTransform(matrix.inverse()).y;
+    return point.matrixTransform(matrix.inverse());
   };
 
   const measure = () => {
@@ -126,15 +133,42 @@ const initializeRoute = (page: HTMLElement) => {
     routeTop = bounds.top + window.scrollY;
     routeHeight = bounds.height;
     markerDistances.clear();
+    markerPositions.clear();
 
     stops.forEach((stopElement) => {
-      const y = markerY(stopElement);
-      if (y !== undefined) markerDistances.set(stopElement, pathLengthAtY(y));
+      const position = markerPosition(stopElement);
+      if (position) markerPositions.set(stopElement, position);
     });
 
-    const finalStop = stops.at(-1);
-    const measuredFinalStopY = finalStop ? markerY(finalStop) : undefined;
-    if (measuredFinalStopY !== undefined) finalStopY = measuredFinalStopY;
+    const points = stops
+      .map((stopElement) => markerPositions.get(stopElement))
+      .filter((point): point is DOMPoint => point !== undefined);
+    if (points.length !== stops.length) return;
+
+    const firstPoint = points[0];
+    const lastPoint = points.at(-1);
+    if (!firstPoint || !lastPoint) return;
+
+    let pathData = `M ${firstPoint.x} ${firstPoint.y}`;
+    for (let index = 1; index < points.length; index += 1) {
+      const previous = points[index - 1];
+      const point = points[index];
+      if (!previous || !point) continue;
+
+      const distance = point.y - previous.y;
+      pathData += ` C ${previous.x} ${previous.y + distance * 0.45} ${point.x} ${point.y - distance * 0.45} ${point.x} ${point.y}`;
+    }
+    pathLayers.forEach((path) => path.setAttribute('d', pathData));
+
+    pathLength = line.getTotalLength();
+    if (pathLength <= 0) return;
+
+    firstStopY = firstPoint.y;
+    finalStopY = lastPoint.y;
+    stops.forEach((stopElement) => {
+      const position = markerPositions.get(stopElement);
+      if (position) markerDistances.set(stopElement, pathLengthAtY(position.y));
+    });
     update();
   };
 
@@ -142,7 +176,7 @@ const initializeRoute = (page: HTMLElement) => {
     frame = 0;
     if (routeHeight <= 0) return;
 
-    const scrollAnchor = window.innerHeight * 0.72;
+    const scrollAnchor = window.innerHeight * 0.5;
     const localY = Math.max(
       0,
       Math.min(
@@ -150,17 +184,34 @@ const initializeRoute = (page: HTMLElement) => {
         ((window.scrollY + scrollAnchor - routeTop) / routeHeight) * viewBoxHeight,
       ),
     );
+    const startDistance = pathLengthAtY(firstStopY);
     const finalDistance = pathLengthAtY(finalStopY);
-    if (!Number.isFinite(finalDistance) || finalDistance <= 0) return;
+    const journeyLength = finalDistance - startDistance;
+    if (!Number.isFinite(journeyLength) || journeyLength <= 0) return;
     const progress =
-      localY <= 0 ? 0 : localY >= finalStopY ? 1 : pathLengthAtY(localY) / finalDistance;
+      localY <= firstStopY
+        ? 0
+        : localY >= finalStopY
+          ? 1
+          : (pathLengthAtY(localY) - startDistance) / journeyLength;
     const normalizedProgress = Math.max(0, Math.min(1, progress));
 
     line.style.strokeDashoffset = String(1 - normalizedProgress);
-    stops.forEach((stopElement) => {
+    stops.forEach((stopElement, index) => {
       const stopDistance = markerDistances.get(stopElement);
-      const threshold = stopDistance === undefined ? 1 : Math.min(1, stopDistance / finalDistance);
+      const threshold =
+        stopDistance === undefined
+          ? 1
+          : Math.min(1, Math.max(0, (stopDistance - startDistance) / journeyLength));
       stopElement.classList.toggle('is-reached', normalizedProgress >= threshold);
+      const currentPosition = markerPositions.get(stopElement)?.y;
+      const nextStop = stops[index + 1];
+      const nextPosition = nextStop ? markerPositions.get(nextStop)?.y : undefined;
+      const isCurrent =
+        currentPosition !== undefined &&
+        (index === 0 || localY >= currentPosition) &&
+        (nextPosition === undefined || localY < nextPosition);
+      stopElement.classList.toggle('is-current', isCurrent);
     });
   };
 
@@ -169,11 +220,23 @@ const initializeRoute = (page: HTMLElement) => {
     frame = window.requestAnimationFrame(update);
   };
 
-  const pulseObserver = new IntersectionObserver(
-    ([entry]) => route.classList.toggle('is-pulse-active', entry.isIntersecting),
-    { rootMargin: '20% 0px', threshold: 0 },
-  );
-  pulseObserver.observe(route);
+  const journey = route.closest<HTMLElement>('.ascent-journey');
+  let pulseObserver: IntersectionObserver | undefined;
+  let snapObserver: IntersectionObserver | undefined;
+  if (!reducedMotion) {
+    pulseObserver = new IntersectionObserver(
+      ([entry]) => route.classList.toggle('is-pulse-active', entry.isIntersecting),
+      { rootMargin: '20% 0px', threshold: 0 },
+    );
+    pulseObserver.observe(route);
+
+    snapObserver = new IntersectionObserver(
+      ([entry]) =>
+        document.documentElement.classList.toggle('ascent-is-on-journey', entry.isIntersecting),
+      { threshold: 0 },
+    );
+    if (journey) snapObserver.observe(journey);
+  }
 
   window.addEventListener('scroll', scheduleUpdate, { passive: true });
   window.addEventListener('resize', measure, { passive: true });
@@ -186,7 +249,9 @@ const initializeRoute = (page: HTMLElement) => {
     window.removeEventListener('scroll', scheduleUpdate);
     window.removeEventListener('resize', measure);
     resizeObserver?.disconnect();
-    pulseObserver.disconnect();
+    pulseObserver?.disconnect();
+    snapObserver?.disconnect();
+    document.documentElement.classList.remove('ascent-is-on-journey');
     pulseTrail?.style.removeProperty('stroke-dashoffset');
     pulse?.style.removeProperty('stroke-dashoffset');
     route.classList.remove('is-pulse-active');
@@ -195,14 +260,82 @@ const initializeRoute = (page: HTMLElement) => {
 
 const initializeScrollEffects = (page: HTMLElement) => {
   const altitude = page.querySelector<HTMLElement>('[data-altitude-value]');
-  const updateScroll = scroll((progress) => {
-    const normalized = Math.max(0, Math.min(1, progress));
-    const rounded = Math.round(normalized * 2519);
-    if (altitude) altitude.textContent = rounded.toLocaleString('en-US');
+  const currentLabel = page.querySelector<HTMLElement>('[data-current-section]');
+  const sections = Array.from(page.querySelectorAll<HTMLElement>('[data-ascent-section]'));
+  const ticks = Array.from(page.querySelectorAll<HTMLElement>('[data-meter-stop]'));
+  let landmarks: Array<{ top: number; altitude: number; label: string; id: string }> = [];
+  let frame = 0;
+
+  const measureLandmarks = () => {
+    landmarks = sections
+      .map((section) => {
+        const bounds = section.getBoundingClientRect();
+        return {
+          top:
+            bounds.top +
+            window.scrollY +
+            Math.max(0, Math.min(window.innerHeight / 2, bounds.height - window.innerHeight / 2)),
+          altitude: Number(section.dataset.sectionAltitude),
+          label: section.dataset.sectionLabel ?? '',
+          id: section.id,
+        };
+      })
+      .filter((landmark) => Number.isFinite(landmark.altitude))
+      .sort((first, second) => first.top - second.top);
+    updateScrollEffects();
+  };
+
+  const updateScrollEffects = () => {
+    frame = 0;
+    if (landmarks.length === 0) return;
+
+    const scrollPosition = window.scrollY + window.innerHeight / 2;
+    let segmentIndex = 0;
+    while (
+      segmentIndex < landmarks.length - 1 &&
+      scrollPosition >= landmarks[segmentIndex + 1].top
+    ) {
+      segmentIndex += 1;
+    }
+
+    const current = landmarks[segmentIndex];
+    const next = landmarks[segmentIndex + 1];
+    const sectionProgress = next
+      ? Math.max(
+          0,
+          Math.min(1, (scrollPosition - current.top) / Math.max(1, next.top - current.top)),
+        )
+      : 0;
+    const currentAltitude =
+      current.altitude + (next ? (next.altitude - current.altitude) * sectionProgress : 0);
+    const normalized = Math.max(0, Math.min(1, currentAltitude / 2519));
+
+    if (altitude) altitude.textContent = Math.round(currentAltitude).toLocaleString('en-US');
     page.style.setProperty('--meter-progress', String(normalized));
     page.style.setProperty('--page-progress', String(normalized));
+    if (currentLabel) currentLabel.textContent = current.label;
+    ticks.forEach((tick) => {
+      if (tick.dataset.meterStop === current.id) tick.setAttribute('aria-current', 'location');
+      else tick.removeAttribute('aria-current');
+    });
+  };
+
+  const scheduleUpdate = () => {
+    if (frame) return;
+    frame = window.requestAnimationFrame(updateScrollEffects);
+  };
+
+  const resizeObserver = new ResizeObserver(measureLandmarks);
+  sections.forEach((section) => resizeObserver.observe(section));
+  window.addEventListener('scroll', scheduleUpdate, { passive: true });
+  window.addEventListener('resize', measureLandmarks, { passive: true });
+  addCleanup(() => {
+    window.cancelAnimationFrame(frame);
+    resizeObserver.disconnect();
+    window.removeEventListener('scroll', scheduleUpdate);
+    window.removeEventListener('resize', measureLandmarks);
   });
-  addCleanup(updateScroll);
+  measureLandmarks();
 
   const setClimate = (section: Element) => {
     const climate = section.getAttribute('data-climate');
@@ -220,26 +353,18 @@ const initializeScrollEffects = (page: HTMLElement) => {
     if (token) page.style.setProperty('--active-sky', `var(${token})`);
   };
 
-  const sections = page.querySelectorAll<HTMLElement>('[data-ascent-section]');
+  const observedSections = page.querySelectorAll<HTMLElement>('[data-ascent-section]');
   const sectionObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         const section = entry.target;
         setClimate(section);
-        const label = section.getAttribute('data-section-label');
-        const currentLabel = page.querySelector<HTMLElement>('[data-current-section]');
-        if (currentLabel && label) currentLabel.textContent = label;
-        const currentTick = section.id;
-        page.querySelectorAll<HTMLElement>('[data-meter-stop]').forEach((tick) => {
-          if (tick.dataset.meterStop === currentTick) tick.setAttribute('aria-current', 'location');
-          else tick.removeAttribute('aria-current');
-        });
       });
     },
     { rootMargin: '-44% 0px -44% 0px', threshold: 0 },
   );
-  sections.forEach((section) => sectionObserver.observe(section));
+  observedSections.forEach((section) => sectionObserver.observe(section));
   addCleanup(() => sectionObserver.disconnect());
 };
 
@@ -306,7 +431,7 @@ export const initializeAscent = () => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   page.dataset.motion = reducedMotion ? 'reduced' : 'full';
   page.classList.remove('is-enhanced');
-  initializeRoute(page);
+  initializeRoute(page, reducedMotion);
 
   if (reducedMotion) {
     page.querySelectorAll<HTMLElement>('[data-reveal]').forEach((element) => {

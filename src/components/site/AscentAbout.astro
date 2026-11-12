@@ -77,6 +77,9 @@ const sections = [
   { id: 'contact', label: 'Summit', altitude: '2,519' },
 ];
 
+const sectionAltitude = (id: string) =>
+  Number(sections.find((section) => section.id === id)?.altitude.replace(',', '') ?? 0);
+
 const principles = [
   {
     number: '01 / אמינות',
@@ -131,6 +134,7 @@ const principles = [
     class="ascent-hero ascent-section"
     data-ascent-section
     data-climate="night"
+    data-section-altitude={sectionAltitude('intro')}
     data-section-label="Home"
     id="intro"
   >
@@ -205,6 +209,7 @@ const principles = [
       class="ascent-about ascent-section"
       data-ascent-section
       data-climate="dawn"
+      data-section-altitude={sectionAltitude('about')}
       data-section-label="About"
       id="about"
     >
@@ -258,6 +263,7 @@ const principles = [
       class="ascent-journey ascent-section"
       data-ascent-section
       data-climate="sunrise"
+      data-section-altitude={sectionAltitude('journey')}
       data-section-label="Experience"
       id="journey"
     >
@@ -335,6 +341,7 @@ const principles = [
       class="ascent-toolkit ascent-section"
       data-ascent-section
       data-climate="high"
+      data-section-altitude={sectionAltitude('toolkit')}
       data-section-label="Toolkit"
       id="toolkit"
     >
@@ -382,6 +389,7 @@ const principles = [
       class="ascent-project ascent-section"
       data-ascent-section
       data-climate="dusk"
+      data-section-altitude={sectionAltitude('project')}
       data-section-label="Featured Project"
       id="project"
     >
@@ -429,6 +437,7 @@ const principles = [
       class="ascent-values ascent-section"
       data-ascent-section
       data-climate="twilight"
+      data-section-altitude={sectionAltitude('values')}
       data-section-label="Values"
       id="values"
     >
@@ -473,6 +482,7 @@ const principles = [
       class="ascent-education ascent-section"
       data-ascent-section
       data-climate="summit"
+      data-section-altitude={sectionAltitude('education')}
       data-section-label="Education & Service"
       id="education"
     >
@@ -530,6 +540,7 @@ const principles = [
       class="ascent-contact ascent-section"
       data-ascent-section
       data-climate="night"
+      data-section-altitude={sectionAltitude('contact')}
       data-section-label="Summit"
       id="contact"
     >

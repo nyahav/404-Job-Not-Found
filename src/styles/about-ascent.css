@@ -190,17 +190,22 @@
 }
 
 .ascent-hero__title {
-  max-width: 9ch;
+  display: flex;
+  max-width: none;
+  align-items: baseline;
+  gap: 0.06em;
   margin: var(--space-4) 0 0;
   font-family: var(--font-editorial);
   font-size: var(--type-display);
   font-weight: 500;
   letter-spacing: -0.035em;
-  line-height: 0.78;
+  line-height: 0.9;
+  white-space: nowrap;
 }
 
 .ascent-title-mask {
-  display: block;
+  display: inline-block;
+  flex: 0 0 auto;
   overflow: clip;
   padding-block: 0.08em 0.16em;
 }
@@ -605,6 +610,16 @@
     );
 }
 
+html.ascent-is-on-journey {
+  scroll-snap-type: y mandatory;
+}
+
+.ascent-about,
+.ascent-toolkit {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
 .ascent-section-head {
   display: flex;
   align-items: end;
@@ -625,7 +640,6 @@
   position: relative;
   max-width: 68rem;
   margin-inline: auto;
-  padding-block: var(--space-4);
 }
 
 .ascent-route__map {
@@ -646,8 +660,8 @@
 }
 
 .ascent-route__shadow {
-  stroke: rgb(var(--accent-rgb) / 14%);
-  stroke-width: 9;
+  stroke: rgb(var(--text-primary-rgb) / 28%);
+  stroke-width: 4;
 }
 
 .ascent-route__line {
@@ -736,17 +750,20 @@
 .ascent-route__stops {
   position: relative;
   display: grid;
-  gap: clamp(var(--space-4), 7vw, var(--space-8));
+  gap: 0;
 }
 
 .ascent-stop {
   position: relative;
   display: grid;
+  min-height: 100svh;
   width: min(75%, 47rem);
   grid-template-columns: 3.75rem minmax(0, 1fr);
-  align-items: start;
+  align-items: center;
   gap: var(--space-2);
   margin-inline-start: 12%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
   --route-opacity: 0;
 }
 
@@ -774,7 +791,9 @@
     box-shadow var(--duration-base) var(--ease-standard);
 }
 
-.ascent-stop.is-reached .ascent-stop__marker {
+.ascent-stop.is-reached .ascent-stop__marker,
+.ascent-stop.is-current .ascent-stop__marker,
+.ascent-stop:hover .ascent-stop__marker {
   background: var(--accent);
   color: var(--text-on-accent);
   box-shadow: 0 0 1.7rem rgb(var(--accent-rgb) / 42%);
@@ -795,6 +814,10 @@
 .ascent-stop__card:hover {
   border-color: rgb(var(--accent-rgb) / 52%);
   background-color: rgb(var(--background-elevated-rgb) / 64%);
+}
+
+.ascent-stop.is-current .ascent-stop__card {
+  border-color: rgb(var(--accent-rgb) / 34%);
 }
 
 .ascent-stop__heading {
@@ -1095,7 +1118,7 @@
 }
 
 .ascent-values {
-  padding-block: var(--section-space);
+  padding-block: var(--section-space) var(--space-4);
   background:
     radial-gradient(ellipse at 85% 50%, rgb(var(--accent-ice-rgb) / 8%), transparent 38%),
     color-mix(in srgb, var(--sky-twilight) 78%, var(--active-sky, var(--sky-twilight)) 22%);
@@ -1224,7 +1247,7 @@
 .ascent-closing-photo {
   position: relative;
   display: grid;
-  min-height: clamp(20rem, 45vw, 40rem);
+  min-height: clamp(12rem, 20vw, 18rem);
   overflow: hidden;
   place-items: center;
   background: var(--background-elevated);
@@ -1263,7 +1286,7 @@
 }
 
 .ascent-education__content {
-  padding-block-start: var(--section-space);
+  padding-block-start: var(--space-4);
 }
 
 .ascent-education__grid {
@@ -1594,7 +1617,7 @@ html[dir='ltr'] .ascent-page.is-enhanced .ascent-closing-photo[data-photo-reveal
 
   .ascent-hero__title {
     margin-block-start: var(--space-3);
-    font-size: clamp(4.75rem, 22vw, 7.5rem);
+    font-size: clamp(3.5rem, 19vw, 7.5rem);
   }
 
   .ascent-hero__role {
@@ -1716,7 +1739,11 @@ html[dir='ltr'] .ascent-page.is-enhanced .ascent-closing-photo[data-photo-reveal
   }
 
   .ascent-closing-photo {
-    min-height: 24rem;
+    min-height: clamp(10rem, 32vw, 14rem);
+  }
+
+  .ascent-education__content {
+    padding-block-start: var(--space-3);
   }
 
   .ascent-education__grid {
@@ -1760,6 +1787,10 @@ html[dir='ltr'] .ascent-page.is-enhanced .ascent-closing-photo[data-photo-reveal
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html.ascent-is-on-journey {
+    scroll-snap-type: none;
+  }
+
   .ascent-page *,
   .ascent-page *::before,
   .ascent-page *::after {
