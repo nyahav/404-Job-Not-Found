@@ -6,22 +6,15 @@ import {
   useReducedMotion,
   useScroll,
 } from 'framer-motion';
-import { ArrowUpRight, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { MOTION_DURATION, MOTION_EASE } from './motion';
 
 interface SiteNavbarProps {
   basePath: string;
   currentPath: string;
-  aboutLabel: string;
-  articlesLabel: string;
 }
 
-export default function SiteNavbar({
-  basePath,
-  currentPath,
-  aboutLabel,
-  articlesLabel,
-}: SiteNavbarProps) {
+export default function SiteNavbar({ basePath, currentPath }: SiteNavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const reduceMotion = useReducedMotion();
@@ -51,7 +44,7 @@ export default function SiteNavbar({
 
   const links = [
     { href: basePath, label: 'Home', path: basePath },
-    { href: `${basePath}about/`, label: aboutLabel, path: `${basePath}about/` },
+    { href: `${basePath}about/`, label: 'About Me', path: `${basePath}about/` },
     {
       href: `${basePath}cloud-architect/`,
       label: 'Cloud Architect',
@@ -63,7 +56,7 @@ export default function SiteNavbar({
       path: `${basePath}database-explorer/`,
     },
     { href: `${basePath}3-am/`, label: '3 AM Lab', path: `${basePath}3-am/` },
-    { href: `${basePath}#articles`, label: articlesLabel, path: `${basePath}#articles` },
+    { href: `${basePath}#articles`, label: 'Articles', path: `${basePath}#articles` },
   ];
 
   const isCurrent = (path: string) =>
@@ -98,7 +91,12 @@ export default function SiteNavbar({
             rel="noopener noreferrer"
             target="_blank"
           >
-            in <ArrowUpRight aria-hidden="true" size={14} />
+            <svg aria-hidden="true" className="site-nav__social-icon" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2ZM8.34 18H5.67V9.4h2.67ZM7 8.23a1.55 1.55 0 1 1 0-3.1 1.55 1.55 0 0 1 0 3.1ZM18.34 18h-2.67v-4.19c0-1-.02-2.29-1.4-2.29s-1.62 1.1-1.62 2.22V18H9.98V9.4h2.56v1.17h.04a2.8 2.8 0 0 1 2.51-1.38c2.69 0 3.19 1.77 3.19 4.07Z"
+              />
+            </svg>
           </a>
           <a
             aria-label="GitHub profile (opens in a new tab)"
@@ -107,7 +105,12 @@ export default function SiteNavbar({
             rel="noopener noreferrer"
             target="_blank"
           >
-            GH <ArrowUpRight aria-hidden="true" size={14} />
+            <svg aria-hidden="true" className="site-nav__social-icon" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.56.1.76-.24.76-.54v-2.1c-3.1.68-3.76-1.32-3.76-1.32-.5-1.29-1.24-1.63-1.24-1.63-1.01-.69.08-.68.08-.68 1.12.08 1.72 1.15 1.72 1.15.99 1.7 2.59 1.21 3.22.93.1-.72.39-1.21.7-1.49-2.48-.28-5.09-1.24-5.09-5.52 0-1.22.44-2.22 1.15-3-.12-.28-.5-1.42.11-2.95 0 0 .94-.3 3.05 1.15a10.58 10.58 0 0 1 5.55 0c2.12-1.45 3.05-1.15 3.05-1.15.61 1.53.23 2.67.11 2.95.72.78 1.15 1.78 1.15 3 0 4.3-2.61 5.24-5.1 5.52.4.35.75 1.03.75 2.08v3.08c0 .3.2.65.77.54A11.1 11.1 0 0 0 12 .9Z"
+              />
+            </svg>
           </a>
         </div>
 

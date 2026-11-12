@@ -112,8 +112,7 @@
 
 .ascent-hero__image {
   object-position: center 52%;
-  transform: translate3d(0, var(--hero-scroll-y, 0), 0) scale(1.08);
-  will-change: transform;
+  transform: scale(1.04);
 }
 
 .ascent-hero__veil {
@@ -155,92 +154,6 @@
 
 .ascent-hero__coordinates span {
   color: var(--accent);
-}
-
-.ascent-hero__skyline {
-  position: absolute;
-  z-index: -1;
-  inset: auto -5% 0;
-  height: clamp(20rem, 58vh, 46rem);
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.ascent-hero__skyline::before {
-  position: absolute;
-  z-index: 4;
-  inset: 0 0 auto;
-  height: 62%;
-  background: linear-gradient(180deg, transparent, rgb(var(--background-base-rgb) / 15%));
-  content: '';
-}
-
-.ascent-hero__glow {
-  position: absolute;
-  inset: 10% 12% 0;
-  background: radial-gradient(ellipse at 44% 64%, rgb(var(--accent-rgb) / 27%), transparent 42%);
-  filter: blur(1rem);
-}
-
-.ascent-ridge {
-  position: absolute;
-  inset: 0;
-  transform: translate3d(0, var(--scroll-ridge-y, 0), 0);
-  will-change: transform;
-}
-
-.ascent-ridge__shape {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  transform: translate3d(var(--pointer-ridge-x, 0), var(--pointer-ridge-y, 0), 0);
-}
-
-.ascent-ridge:nth-of-type(3) {
-  opacity: 0.9;
-}
-
-.ascent-ridge:nth-of-type(4) {
-  opacity: 0.92;
-}
-
-.ascent-ridge:nth-of-type(5) {
-  opacity: 0.96;
-}
-
-.ascent-fog {
-  position: absolute;
-  z-index: 6;
-  inset-inline: -15%;
-  height: 34%;
-  border-radius: 50%;
-  background: radial-gradient(
-    ellipse at 50% 50%,
-    rgb(var(--fog-glacier-rgb) / 24%),
-    transparent 70%
-  );
-  filter: blur(2.2rem);
-  opacity: 0.48;
-  pointer-events: none;
-}
-
-.ascent-fog--one {
-  inset-block-end: 32%;
-  animation: ascent-fog-drift 32s ease-in-out infinite alternate;
-}
-
-.ascent-fog--two {
-  inset-block-end: 8%;
-  opacity: 0.34;
-  animation: ascent-fog-drift 42s ease-in-out infinite alternate-reverse;
-}
-
-@keyframes ascent-fog-drift {
-  to {
-    transform: translate3d(-4%, 0, 0);
-  }
 }
 
 .ascent-hero__content {
@@ -1702,11 +1615,6 @@ html[dir='ltr'] .ascent-page.is-enhanced .ascent-closing-photo[data-photo-reveal
     font-size: 0.58rem;
   }
 
-  .ascent-hero__skyline {
-    height: 48vh;
-    min-height: 19rem;
-  }
-
   .ascent-hero__content {
     padding-block: 0 8rem;
   }
@@ -1921,8 +1829,6 @@ html[dir='ltr'] .ascent-page.is-enhanced .ascent-closing-photo[data-photo-reveal
     transform: none;
   }
 
-  .ascent-page .ascent-ridge,
-  .ascent-page .ascent-ridge__shape,
   .ascent-page .ascent-hero__image {
     transform: none;
     will-change: auto;

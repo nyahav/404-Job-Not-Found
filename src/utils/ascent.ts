@@ -75,15 +75,6 @@ const initializeReveals = (page: HTMLElement) => {
       addCleanup(() => controls.stop());
     });
   });
-
-  page.querySelectorAll<HTMLElement>('[data-ridge]').forEach((ridge, index) => {
-    const controls = animate(
-      ridge,
-      { opacity: [0, 1], clipPath: ['inset(100% 0 0)', 'inset(0)'] },
-      { duration: 1.3, delay: index * 0.12, ease: [0.77, 0, 0.175, 1] },
-    );
-    addCleanup(() => controls.stop());
-  });
 };
 
 const initializeRoute = (page: HTMLElement) => {
@@ -131,10 +122,8 @@ const initializeCounts = (page: HTMLElement, enabled: boolean) => {
   });
 };
 
-const initializeScrollEffects = (page: HTMLElement, reducedMotion: boolean) => {
+const initializeScrollEffects = (page: HTMLElement) => {
   const altitude = page.querySelector<HTMLElement>('[data-altitude-value]');
-  const hero = page.querySelector<HTMLElement>('.ascent-hero');
-  const ridges = Array.from(page.querySelectorAll<HTMLElement>('[data-ridge]'));
   const updateScroll = scroll((progress) => {
     const normalized = Math.max(0, Math.min(1, progress));
     const rounded = Math.round(normalized * 2519);
@@ -143,22 +132,6 @@ const initializeScrollEffects = (page: HTMLElement, reducedMotion: boolean) => {
     page.style.setProperty('--page-progress', String(normalized));
   });
   addCleanup(updateScroll);
-
-  if (!reducedMotion && hero && window.matchMedia('(min-width: 48rem)').matches) {
-    addCleanup(
-      scroll(
-        (progress) => {
-          const offset = Math.max(0, Math.min(1, progress));
-          hero.style.setProperty('--hero-scroll-y', `${offset * 44}px`);
-          ridges.forEach((ridge) => {
-            const depth = Number(ridge.style.getPropertyValue('--ridge-depth')) || 0;
-            ridge.style.setProperty('--scroll-ridge-y', `${offset * depth * 64}px`);
-          });
-        },
-        { target: hero, offset: ['start start', 'end start'] },
-      ),
-    );
-  }
 
   const setClimate = (section: Element) => {
     const climate = section.getAttribute('data-climate');
@@ -205,21 +178,8 @@ const initializePointerEffects = (page: HTMLElement, reducedMotion: boolean) => 
   const cursor = page.querySelector<HTMLElement>('[data-custom-cursor]');
   const canUseCursor = Boolean(cursor && window.matchMedia('(min-width: 64rem)').matches);
   const isRtl = document.documentElement.dir === 'rtl';
-  const ridgeShapes = Array.from(page.querySelectorAll<SVGElement>('.ascent-ridge__shape'));
 
   const onPointerMove = (event: PointerEvent) => {
-    const normalizedX = (event.clientX / window.innerWidth - 0.5) * (isRtl ? -1 : 1);
-    const normalizedY = event.clientY / window.innerHeight - 0.5;
-
-    ridgeShapes.forEach((shape) => {
-      const depth =
-        Number(
-          shape.closest<HTMLElement>('[data-ridge]')?.style.getPropertyValue('--ridge-depth'),
-        ) || 0;
-      shape.style.setProperty('--pointer-ridge-x', `${normalizedX * depth * 18}px`);
-      shape.style.setProperty('--pointer-ridge-y', `${normalizedY * depth * 12}px`);
-    });
-
     page.querySelectorAll<HTMLElement>('[data-tilt]').forEach((card) => {
       const rect = card.getBoundingClientRect();
       const x = (event.clientX - rect.left) / rect.width;
@@ -292,14 +252,14 @@ export const initializeAscent = () => {
     page.querySelectorAll<HTMLElement>('[data-reveal]').forEach((element) => {
       element.classList.add('is-visible');
     });
-    initializeScrollEffects(page, true);
+    initializeScrollEffects(page);
     return;
   }
 
   initializeReveals(page);
   initializeRoute(page);
   initializeCounts(page, window.matchMedia('(min-width: 48rem)').matches);
-  initializeScrollEffects(page, reducedMotion);
+  initializeScrollEffects(page);
   initializePointerEffects(page, reducedMotion);
   page.classList.add('is-enhanced');
 };

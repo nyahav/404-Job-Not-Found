@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-  [string]$CommitMessage = 'Update About page mountain ridges'
+  [string]$CommitMessage = 'Update website'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -104,21 +104,20 @@ try {
   $env:PATH = $originalPath
 }
 
-$files = @('src/pages/about.astro', 'src/utils/ridges.ts')
-Invoke-Git add -- $files
+Invoke-Git add --all
 $hasChanges = $false
-& git diff --cached --quiet -- $files
+& git diff --cached --quiet
 if ($LASTEXITCODE -eq 1) {
   $hasChanges = $true
 } elseif ($LASTEXITCODE -ne 0) {
-  throw 'Could not inspect staged About page changes.'
+  throw 'Could not inspect staged changes.'
 }
 
 if (-not $hasChanges) {
-  Write-Output 'Build succeeded; there are no About page changes to commit.'
+  Write-Output 'Build succeeded; there are no site changes to commit.'
   exit 0
 }
 
 Invoke-Git commit -m $CommitMessage -m 'Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>'
 Invoke-Git push origin main
-Write-Output 'Changes pushed. GitHub Actions will build and deploy the site to GitHub Pages.'
+Write-Output 'All site changes pushed. GitHub Actions will deploy the site to GitHub Pages.'

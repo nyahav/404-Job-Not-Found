@@ -41,11 +41,17 @@ npm run format:check
 npm run build
 ```
 
-On Windows, `.\scripts\publish-about.ps1` builds the site, then commits and
-pushes only the About page and its ridge generator to `main`. It uses Node.js
-22.23.4 or newer from `PATH`, or finds a supported Node.js runtime in the local
-npm cache.
-.\scripts\publish-about.ps1
+On Windows, review your working tree, then run `.\scripts\publish-site.ps1` to
+build the entire site, stage all non-ignored changes, commit them, and push the
+commit to `main`. The script includes modified, deleted, and untracked files,
+so make sure everything in the working tree is intended for publication. It
+uses Node.js 22.23.4 or newer from `PATH`, or finds a supported Node.js runtime
+in the local npm cache. GitHub Actions deploys the site after the push.
+
+```powershell
+.\scripts\publish-site.ps1
+```
+
 ## Project structure
 
 ```text

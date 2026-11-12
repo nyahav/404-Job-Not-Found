@@ -37,6 +37,15 @@
   white-space: nowrap;
 }
 
+.site-brand:hover {
+  color: var(--accent-active);
+}
+
+.site-brand:hover .site-brand__mark,
+.site-brand:hover .site-brand__divider {
+  color: var(--accent-active);
+}
+
 .site-brand__mark,
 .site-brand__divider,
 .site-footer__brand span {
@@ -77,8 +86,11 @@
 .site-nav__social {
   min-width: 2.75rem;
   padding-inline: var(--space-2);
-  font-family: var(--font-code);
-  font-size: var(--type-caption);
+}
+
+.site-nav__social-icon {
+  width: 1.2rem;
+  height: 1.2rem;
 }
 
 .site-nav__toggle {

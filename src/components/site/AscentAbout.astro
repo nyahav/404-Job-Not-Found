@@ -4,7 +4,6 @@ import ContourLines from './ContourLines.astro';
 import seceda from '../../assets/mountains/seceda.jpg';
 import mountainClouds from '../../assets/mountains/mountain-clouds.jpg';
 import mountainTrail from '../../assets/mountains/mountain-trail.jpg';
-import { buildRidge, type RidgeOptions } from '../../utils/ridges';
 import '../../styles/about-ascent.css';
 
 const basePath = import.meta.env.BASE_URL.endsWith('/')
@@ -64,96 +63,15 @@ const skillGroups = [
   },
 ];
 
-type RidgeLayer = RidgeOptions & {
-  id: string;
-  depth: number;
-  crest: string;
-  haze: string;
-  hold?: number;
-  trees?: { w: number; h: number; gap?: number; edgeBoost?: boolean };
-};
-
-const ridgeLayers: RidgeLayer[] = [
-  {
-    id: 'far',
-    depth: 0.16,
-    crest: 'var(--ridge-sage)',
-    haze: 'var(--sky-sunrise)',
-    seed: 11,
-    base: 420,
-    amp: 275,
-    peaks: 5,
-    sharp: 1.05,
-    crag: 0.07,
-    rough: 10,
-  },
-  {
-    id: 'blue',
-    depth: 0.32,
-    crest: 'var(--ridge-blue)',
-    haze: 'var(--ridge-pine)',
-    seed: 47,
-    base: 438,
-    amp: 230,
-    peaks: 6,
-    sharp: 1.15,
-    crag: 0.06,
-    rough: 9,
-  },
-  {
-    id: 'middle',
-    depth: 0.54,
-    crest: 'var(--ridge-forest)',
-    haze: 'var(--ridge-night)',
-    seed: 23,
-    base: 454,
-    amp: 185,
-    peaks: 6,
-    sharp: 1.3,
-    crag: 0.045,
-    rough: 7,
-  },
-  {
-    id: 'near',
-    depth: 0.76,
-    crest: 'var(--ridge-pine)',
-    haze: 'var(--background-base)',
-    seed: 91,
-    base: 468,
-    amp: 135,
-    peaks: 7,
-    sharp: 1.9,
-    crag: 0.02,
-    rough: 4,
-    trees: { w: 4, h: 11, gap: 0.7 },
-  },
-  {
-    id: 'front',
-    depth: 1,
-    crest: 'var(--ridge-night)',
-    haze: 'var(--background-base)',
-    hold: 0.9,
-    seed: 5,
-    base: 480,
-    amp: 48,
-    peaks: 4,
-    sharp: 1.6,
-    crag: 0.01,
-    rough: 2,
-    trees: { w: 9, h: 72, gap: 1.5, edgeBoost: true },
-  },
-];
-const ridges = ridgeLayers.map((layer) => ({ ...layer, ...buildRidge(layer) }));
-
 const sections = [
-  { id: 'intro', label: 'ראשי', altitude: '000' },
-  { id: 'about', label: 'עליי', altitude: '360' },
-  { id: 'journey', label: 'ניסיון', altitude: '820' },
-  { id: 'toolkit', label: 'כלים', altitude: '1,400' },
-  { id: 'project', label: 'פרויקט', altitude: '1,900' },
-  { id: 'values', label: 'עקרונות', altitude: '2,200' },
-  { id: 'education', label: 'השכלה', altitude: '2,420' },
-  { id: 'contact', label: 'פסגה', altitude: '2,519' },
+  { id: 'intro', label: 'Home', altitude: '000' },
+  { id: 'about', label: 'About', altitude: '360' },
+  { id: 'journey', label: 'Experience', altitude: '820' },
+  { id: 'toolkit', label: 'Toolkit', altitude: '1,400' },
+  { id: 'project', label: 'Featured Project', altitude: '1,900' },
+  { id: 'values', label: 'Values', altitude: '2,200' },
+  { id: 'education', label: 'Education & Service', altitude: '2,420' },
+  { id: 'contact', label: 'Summit', altitude: '2,519' },
 ];
 
 const stats = [
@@ -190,16 +108,16 @@ const principles = [
   <div aria-hidden="true" class="ascent-atmosphere"></div>
   <div aria-hidden="true" class="ascent-cursor" data-custom-cursor></div>
 
-  <nav aria-label="ניווט לפי גובה" class="ascent-meter">
-    <a aria-label="חזרה לראש המסלול" class="ascent-meter__summit" href="#intro">
+  <nav aria-label="Altitude navigation" class="ascent-meter">
+    <a aria-label="Back to the top" class="ascent-meter__summit" href="#intro">
       <span aria-hidden="true">▲</span>
-      <span>פסגה</span>
+      <span>Top</span>
     </a>
     <div class="ascent-meter__track">
       <span class="ascent-meter__fill" data-meter-fill></span>
       {sections.map((section) => (
         <a
-          aria-label={`${section.label}, גובה ${section.altitude} מטר`}
+          aria-label={`${section.label}, altitude ${section.altitude} meters`}
           class="ascent-meter__tick"
           data-meter-stop={section.id}
           href={`#${section.id}`}
@@ -207,14 +125,14 @@ const principles = [
         />
       ))}
     </div>
-    <output aria-label="גובה נוכחי במטרים" class="ascent-meter__reading" data-altitude>
+    <output aria-label="Current altitude in meters" class="ascent-meter__reading" data-altitude>
       <span data-altitude-value>0</span>
-      <span class="ascent-meter__unit">מ׳</span>
+      <span class="ascent-meter__unit">m</span>
     </output>
     <span aria-live="polite" class="ascent-meter__label" data-current-section>
-      ראשי
+      Home
     </span>
-    <span class="ascent-meter__total">2,519 מ׳</span>
+    <span class="ascent-meter__total">2,519 m</span>
   </nav>
 
   <section
@@ -222,7 +140,7 @@ const principles = [
     class="ascent-hero ascent-section"
     data-ascent-section
     data-climate="night"
-    data-section-label="ראשי"
+    data-section-label="Home"
     id="intro"
   >
     <Image
@@ -240,29 +158,6 @@ const principles = [
     <div aria-hidden="true" class="ascent-hero__grain"></div>
     <div aria-hidden="true" class="ascent-hero__coordinates" dir="ltr">
       46°35′ N <span>—</span> 11°43′ E
-    </div>
-
-    <div aria-hidden="true" class="ascent-hero__skyline">
-      <div class="ascent-hero__glow"></div>
-      {ridges.map((ridge, index) => (
-        <div
-          class="ascent-ridge"
-          data-ridge
-          style={`--ridge-depth:${ridge.depth};--ridge-index:${index}`}
-        >
-          <svg
-            aria-hidden="true"
-            class="ascent-ridge__shape"
-            focusable="false"
-            preserveAspectRatio="xMidYMax slice"
-            viewBox="0 0 1600 480"
-          >
-            <path d={ridge.d} fill={ridge.crest} />
-          </svg>
-        </div>
-      ))}
-      <div class="ascent-fog ascent-fog--one"></div>
-      <div class="ascent-fog ascent-fog--two"></div>
     </div>
 
     <div class="ascent-hero__content">
@@ -319,7 +214,7 @@ const principles = [
       class="ascent-about ascent-section"
       data-ascent-section
       data-climate="dawn"
-      data-section-label="עליי"
+      data-section-label="About"
       id="about"
     >
       <ContourLines />
@@ -398,7 +293,7 @@ const principles = [
       class="ascent-journey ascent-section"
       data-ascent-section
       data-climate="sunrise"
-      data-section-label="ניסיון"
+      data-section-label="Experience"
       id="journey"
     >
       <ContourLines />
@@ -477,7 +372,7 @@ const principles = [
       class="ascent-toolkit ascent-section"
       data-ascent-section
       data-climate="high"
-      data-section-label="כלים"
+      data-section-label="Toolkit"
       id="toolkit"
     >
       <ContourLines />
@@ -524,7 +419,7 @@ const principles = [
       class="ascent-project ascent-section"
       data-ascent-section
       data-climate="dusk"
-      data-section-label="פרויקט נבחר"
+      data-section-label="Featured Project"
       id="project"
     >
       <ContourLines />
@@ -571,7 +466,7 @@ const principles = [
       class="ascent-values ascent-section"
       data-ascent-section
       data-climate="twilight"
-      data-section-label="עקרונות"
+      data-section-label="Values"
       id="values"
     >
       <ContourLines />
@@ -615,7 +510,7 @@ const principles = [
       class="ascent-education ascent-section"
       data-ascent-section
       data-climate="summit"
-      data-section-label="השכלה ושירות"
+      data-section-label="Education & Service"
       id="education"
     >
       <div class="ascent-closing-photo" data-photo-reveal>
@@ -672,7 +567,7 @@ const principles = [
       class="ascent-contact ascent-section"
       data-ascent-section
       data-climate="night"
-      data-section-label="פסגה"
+      data-section-label="Summit"
       id="contact"
     >
       <ContourLines />
