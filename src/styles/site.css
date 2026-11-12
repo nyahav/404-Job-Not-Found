@@ -26,6 +26,7 @@
 
 .site-brand,
 .site-footer__brand {
+  position: relative;
   display: inline-flex;
   min-height: 2.75rem;
   align-items: center;
@@ -36,15 +37,64 @@
   letter-spacing: -0.02em;
   text-decoration: none;
   white-space: nowrap;
+  isolation: isolate;
+  transition:
+    color var(--duration-base) var(--ease-standard),
+    transform var(--duration-base) var(--ease-standard);
 }
 
-.site-brand:hover {
+.site-brand:hover,
+.site-brand:focus-visible {
   color: var(--accent-active);
+  transform: translate3d(var(--brand-shift-x, 0), var(--brand-shift-y, 0), 0) scale(1.015);
 }
 
 .site-brand:hover .site-brand__mark,
-.site-brand:hover .site-brand__divider {
+.site-brand:hover .site-brand__divider,
+.site-brand:focus-visible .site-brand__mark,
+.site-brand:focus-visible .site-brand__divider {
   color: var(--accent-active);
+}
+
+.site-brand__bubble {
+  position: absolute;
+  z-index: -1;
+  inset: -0.55rem -0.8rem;
+  border: 1px solid rgb(var(--accent-rgb) / 18%);
+  border-radius: 42% 58% 55% 45% / 54% 43% 57% 46%;
+  background:
+    radial-gradient(ellipse at 34% 32%, rgb(255 200 145 / 42%), transparent 55%),
+    radial-gradient(ellipse at 70% 66%, rgb(var(--accent-rgb) / 32%), transparent 60%),
+    radial-gradient(ellipse at 58% 24%, rgb(232 145 85 / 24%), transparent 56%);
+  box-shadow:
+    0 0 1.4rem rgb(var(--accent-rgb) / 18%),
+    inset 0 0 1rem rgb(255 200 145 / 10%);
+  filter: blur(7px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(var(--brand-orb-x, 0), var(--brand-orb-y, 0), 0) scale(0.76);
+  transition:
+    opacity 360ms var(--ease-standard),
+    transform 500ms var(--ease-standard),
+    border-radius 700ms var(--ease-standard);
+}
+
+.site-brand__bubble::after {
+  position: absolute;
+  inset: 12%;
+  border-radius: 58% 42% 46% 54% / 45% 58% 42% 55%;
+  background: radial-gradient(ellipse, rgb(255 181 116 / 24%), transparent 70%);
+  content: '';
+}
+
+.site-brand:hover .site-brand__bubble,
+.site-brand:focus-visible .site-brand__bubble {
+  opacity: 1;
+  transform: translate3d(var(--brand-orb-x, 0), var(--brand-orb-y, 0), 0) scale(1);
+}
+
+.site-brand:hover .site-brand__bubble {
+  border-radius: 58% 42% 48% 52% / 44% 58% 42% 56%;
 }
 
 .site-brand__mark,
@@ -598,6 +648,13 @@
 
 .article-card {
   display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-brand,
+  .site-brand__bubble {
+    transition: none;
+  }
   padding: var(--card-padding);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-card);

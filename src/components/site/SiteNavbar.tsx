@@ -66,6 +66,7 @@ export default function SiteNavbar({ basePath, currentPath }: SiteNavbarProps) {
     <header className="site-header" data-scrolled={scrolled}>
       <nav aria-label="Main navigation" className="site-nav">
         <a aria-label="404 Job Not Found home" className="site-brand" href={basePath}>
+          <span aria-hidden="true" className="site-brand__bubble" />
           <span className="site-brand__mark">404</span>
           <span className="site-brand__divider" aria-hidden="true">
             /

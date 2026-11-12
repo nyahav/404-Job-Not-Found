@@ -45,6 +45,7 @@ const isCurrent = (path: string) => {
 <header class="site-header" data-base-path={normalizedBasePath} data-scrolled="false">
   <nav aria-label="Main navigation" class="site-nav">
     <a aria-label="404 Job Not Found home" class="site-brand" href={normalizedBasePath}>
+      <span aria-hidden="true" class="site-brand__bubble"></span>
       <span class="site-brand__mark">404</span>
       <span aria-hidden="true" class="site-brand__divider">
         /
@@ -152,6 +153,7 @@ const isCurrent = (path: string) => {
 
       const toggle = header.querySelector<HTMLButtonElement>('[data-nav-toggle]');
       const menu = header.querySelector<HTMLElement>('[data-mobile-menu]');
+      const brand = header.querySelector<HTMLAnchorElement>('.site-brand');
       if (!toggle || !menu) return;
 
       const closeMenu = () => {
@@ -169,6 +171,29 @@ const isCurrent = (path: string) => {
         );
         menu.hidden = isOpen;
       });
+
+      if (brand && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        brand.addEventListener(
+          'pointermove',
+          (event) => {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            const bounds = brand.getBoundingClientRect();
+            const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+            const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+            brand.style.setProperty('--brand-orb-x', `${x * 10}px`);
+            brand.style.setProperty('--brand-orb-y', `${y * 8}px`);
+            brand.style.setProperty('--brand-shift-x', `${x * 1.5}px`);
+            brand.style.setProperty('--brand-shift-y', `${y * 1.5}px`);
+          },
+          { passive: true },
+        );
+        brand.addEventListener('pointerleave', () => {
+          brand.style.removeProperty('--brand-orb-x');
+          brand.style.removeProperty('--brand-orb-y');
+          brand.style.removeProperty('--brand-shift-x');
+          brand.style.removeProperty('--brand-shift-y');
+        });
+      }
 
       menu.addEventListener('click', (event) => {
         if ((event.target as HTMLElement).closest('a')) closeMenu();
