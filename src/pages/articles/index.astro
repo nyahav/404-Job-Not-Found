@@ -1,0 +1,34 @@
+---
+import { getCollection } from 'astro:content';
+import ArticleCarousel from '../../components/site/ArticleCarousel';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+
+const articles = (await getCollection('articles'))
+  .sort((first, second) => second.data.pubDate.valueOf() - first.data.pubDate.valueOf())
+  .map((article) => ({
+    slug: article.id.replace(/\.(md|mdx)$/, ''),
+    title: article.data.title,
+    description: article.data.description,
+    pubDate: article.data.pubDate.toISOString(),
+  }));
+const basePath = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+---
+
+<SiteLayout
+  title="Articles | 404 - Job Not Found"
+  description="מאמרים על תוכנה, מערכות והאינטרנט."
+  lang="he"
+  dir="rtl"
+  wide
+>
+  <div class="articles-page" dir="rtl">
+    <header class="articles-page__intro">
+      <p class="eyebrow-token">The notebook / 01—03</p>
+      <h1>מאמרים ורעיונות</h1>
+      <p>מחשבות, מדריכים ותובנות על תוכנה והאינטרנט.</p>
+    </header>
+    <ArticleCarousel articles={articles} basePath={basePath} client:load />
+  </div>
+</SiteLayout>

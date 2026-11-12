@@ -1,14 +1,14 @@
-import { motion, useReducedMotion } from 'framer-motion';
-import { Activity, ArrowUpRight, Cloud, Database } from 'lucide-react';
-import Reveal from './Reveal';
-import { MOTION_DURATION, MOTION_EASE } from './motion';
+import { Activity, Cloud, Database } from 'lucide-react';
+import ShowcaseCard from './ShowcaseCard';
+import type { FeatureCardItem } from './articleCards';
 
 interface FeatureBentoProps {
   basePath: string;
 }
 
-const items = [
+const items: FeatureCardItem[] = [
   {
+    layout: 'feature',
     href: 'cloud-architect/',
     icon: Cloud,
     eyebrow: '01 / ARCHITECTURE',
@@ -17,6 +17,7 @@ const items = [
       'Explore cloud systems through interactive architecture maps, guides, quizzes, and a design sandbox.',
   },
   {
+    layout: 'feature',
     href: 'database-explorer/',
     icon: Database,
     eyebrow: '02 / DATA SYSTEMS',
@@ -25,6 +26,7 @@ const items = [
       'See how storage engines, concurrency, and query planners behave under production load.',
   },
   {
+    layout: 'feature',
     href: '3-am/',
     icon: Activity,
     eyebrow: '03 / INCIDENT RESPONSE',
@@ -35,32 +37,11 @@ const items = [
 ];
 
 export default function FeatureBento({ basePath }: FeatureBentoProps) {
-  const reduceMotion = useReducedMotion();
-
   return (
     <div className="feature-grid">
-      {items.map((item, index) => {
-        const Icon = item.icon;
-        return (
-          <Reveal className="feature-card-reveal" delay={index * 0.06} key={item.href}>
-            <motion.a
-              className="feature-card"
-              href={`${basePath}${item.href}`}
-              transition={{ duration: MOTION_DURATION.base, ease: MOTION_EASE }}
-              whileHover={reduceMotion ? undefined : { y: -4 }}
-              whileTap={reduceMotion ? undefined : { scale: 0.99 }}
-            >
-              <span aria-hidden="true" className="feature-card__icon">
-                <Icon size={22} strokeWidth={1.7} />
-              </span>
-              <span className="feature-card__eyebrow">{item.eyebrow}</span>
-              <h3>{item.title}</h3>
-              <p className="feature-card__description">{item.description}</p>
-              <ArrowUpRight aria-hidden="true" className="feature-card__arrow" size={20} />
-            </motion.a>
-          </Reveal>
-        );
-      })}
+      {items.map((item, index) => (
+        <ShowcaseCard basePath={basePath} index={index} item={item} key={item.href} />
+      ))}
     </div>
   );
 }

@@ -1,12 +1,18 @@
 ---
 import { getCollection } from 'astro:content';
+import ArticleBento from '../components/site/ArticleBento';
 import FeatureBento from '../components/site/FeatureBento';
 import HomeHero from '../components/site/HomeHero';
 import SiteLayout from '../layouts/SiteLayout.astro';
 
-const articles = (await getCollection('articles')).sort(
-  (first, second) => second.data.pubDate.valueOf() - first.data.pubDate.valueOf(),
-);
+const articles = (await getCollection('articles'))
+  .sort((first, second) => second.data.pubDate.valueOf() - first.data.pubDate.valueOf())
+  .map((article) => ({
+    slug: article.id.replace(/\.(md|mdx)$/, ''),
+    title: article.data.title,
+    description: article.data.description,
+    pubDate: article.data.pubDate.toISOString(),
+  }));
 const basePath = import.meta.env.BASE_URL.endsWith('/')
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
@@ -33,34 +39,14 @@ const basePath = import.meta.env.BASE_URL.endsWith('/')
     <section aria-labelledby="articles-title" class="articles-section" id="articles">
       <div class="section-intro">
         <div>
-          <p class="eyebrow-token">The notebook</p>
+          <p class="eyebrow-token">The notebook / 01—03</p>
           <h2 id="articles-title">Articles</h2>
         </div>
+        <a class="articles-section__link" href={`${basePath}articles/`}>
+          All articles
+        </a>
       </div>
-      {articles.length > 0 ? (
-        <div class="article-grid">
-          {articles.map((article) => (
-            <a
-              class="article-card"
-              href={`${basePath}articles/${article.id.replace(/\.(md|mdx)$/, '')}/`}
-            >
-              <time datetime={article.data.pubDate.toISOString()}>
-                {article.data.pubDate.toLocaleDateString('en', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </time>
-              <h3>{article.data.title}</h3>
-              <p>{article.data.description}</p>
-            </a>
-          ))}
-        </div>
-      ) : (
-        <p class="text-muted">
-          No articles yet. Add an MDX file to <code>src/content/articles/</code>.
-        </p>
-      )}
+      <ArticleBento articles={articles} basePath={basePath} client:visible />
     </section>
   </div>
 </SiteLayout>
