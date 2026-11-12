@@ -1,4 +1,4 @@
-# 404 — Job Not Found
+# 404 - Job Not Found
 
 Astro site starter with React islands, MDX articles, and Tailwind CSS. Pushes to
 `main` are deployed to GitHub Pages using GitHub Actions.
@@ -41,6 +41,11 @@ npm run format:check
 npm run build
 ```
 
+On Windows, `.\scripts\publish-about.ps1` builds the site, then commits and
+pushes only the About page and its ridge generator to `main`. It uses Node.js
+22.23.4 or newer from `PATH`, or finds a supported Node.js runtime in the local
+npm cache.
+.\scripts\publish-about.ps1
 ## Project structure
 
 ```text

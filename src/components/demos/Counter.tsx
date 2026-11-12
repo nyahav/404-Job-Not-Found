@@ -7,18 +7,18 @@ export default function Counter() {
     <div className="flex items-center gap-4">
       <button
         aria-label="Decrease count"
-        className="grid size-10 place-items-center rounded-full border border-slate-700 text-lg transition hover:border-cyan-400 hover:text-cyan-300"
+        className="grid size-11 place-items-center rounded-full border border-line bg-elevated text-lg text-primary transition hover:border-accent hover:text-accent"
         onClick={() => setCount((value) => value - 1)}
         type="button"
       >
         −
       </button>
-      <output aria-live="polite" className="min-w-8 text-center text-xl font-semibold text-white">
+      <output aria-live="polite" className="min-w-8 text-center text-xl font-semibold text-primary">
         {count}
       </output>
       <button
         aria-label="Increase count"
-        className="grid size-10 place-items-center rounded-full border border-slate-700 text-lg transition hover:border-cyan-400 hover:text-cyan-300"
+        className="grid size-11 place-items-center rounded-full border border-line bg-elevated text-lg text-primary transition hover:border-accent hover:text-accent"
         onClick={() => setCount((value) => value + 1)}
         type="button"
       >

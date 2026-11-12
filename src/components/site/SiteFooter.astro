@@ -1,0 +1,25 @@
+---
+interface Props {
+  basePath: string;
+}
+
+const { basePath } = Astro.props;
+---
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <a class="site-footer__brand" href={basePath}>
+      404 <span>/</span> Job Not Found
+    </a>
+    <p>Ideas, systems, and things worth figuring out.</p>
+    <div class="site-footer__links">
+      <a href={`${basePath}about/`}>About</a>
+      <a href="https://github.com/nyahav" rel="noopener noreferrer" target="_blank">
+        GitHub
+      </a>
+      <a href="https://www.linkedin.com/in/nir-yahav/" rel="noopener noreferrer" target="_blank">
+        LinkedIn
+      </a>
+    </div>
+  </div>
+</footer>

@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
-import Counter from '../components/demos/Counter';
+import FeatureBento from '../components/site/FeatureBento';
+import HomeHero from '../components/site/HomeHero';
 import SiteLayout from '../layouts/SiteLayout.astro';
 
 const articles = (await getCollection('articles')).sort(
@@ -12,57 +13,54 @@ const basePath = import.meta.env.BASE_URL.endsWith('/')
 ---
 
 <SiteLayout
-  title="404 — Job Not Found"
+  title="404 - Job Not Found"
   description="Articles and interactive demos exploring software and the web."
+  wide
 >
-  <section class="grid gap-12 md:grid-cols-[1fr_auto] md:items-center">
-    <div>
-      <p class="mb-4 text-sm font-medium tracking-[0.2em] text-cyan-300 uppercase">
-        A place for ideas and experiments
-      </p>
-      <h1 class="max-w-2xl text-5xl font-bold tracking-tight text-white sm:text-6xl">
-        404 <span class="text-cyan-400">—</span> Job Not Found
-      </h1>
-      <p class="mt-6 max-w-xl text-lg leading-8 text-slate-300">
-        Notes, demos, and things worth figuring out along the way.
-      </p>
-    </div>
-    <div class="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-      <p class="mb-4 text-sm text-slate-400">A tiny interactive demo</p>
-      <Counter client:load />
-    </div>
-  </section>
+  <div class="home-page">
+    <HomeHero basePath={basePath} client:load />
 
-  <section id="articles" class="mt-24">
-    <div class="mb-8 flex items-end justify-between gap-4">
-      <div>
-        <p class="text-sm font-medium tracking-[0.2em] text-cyan-300 uppercase">The notebook</p>
-        <h2 class="mt-2 text-3xl font-semibold tracking-tight text-white">Articles</h2>
+    <section aria-labelledby="projects-title" class="features-section" id="projects">
+      <div class="section-intro">
+        <div>
+          <p class="eyebrow-token">Explore / 01—03</p>
+          <h2 id="projects-title">Built to be explored.</h2>
+        </div>
       </div>
-    </div>
-    {articles.length > 0 ? (
-      <div class="grid gap-4 sm:grid-cols-2">
-        {articles.map((article) => (
-          <a
-            class="group rounded-2xl border border-slate-800 bg-slate-900/70 p-6 transition hover:border-cyan-500/60"
-            href={`${basePath}articles/${article.id.replace(/\.(md|mdx)$/, '')}/`}
-          >
-            <p class="text-sm text-slate-400">
-              {article.data.pubDate.toLocaleDateString('en', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </p>
-            <h3 class="mt-3 text-xl font-semibold text-white group-hover:text-cyan-300">
-              {article.data.title}
-            </h3>
-            <p class="mt-2 leading-7 text-slate-300">{article.data.description}</p>
-          </a>
-        ))}
+      <FeatureBento basePath={basePath} client:visible />
+    </section>
+
+    <section aria-labelledby="articles-title" class="articles-section" id="articles">
+      <div class="section-intro">
+        <div>
+          <p class="eyebrow-token">The notebook</p>
+          <h2 id="articles-title">Articles</h2>
+        </div>
       </div>
-    ) : (
-      <p class="text-slate-400">No articles yet. Add an MDX file to `src/content/articles/`.</p>
-    )}
-  </section>
+      {articles.length > 0 ? (
+        <div class="article-grid">
+          {articles.map((article) => (
+            <a
+              class="article-card"
+              href={`${basePath}articles/${article.id.replace(/\.(md|mdx)$/, '')}/`}
+            >
+              <time datetime={article.data.pubDate.toISOString()}>
+                {article.data.pubDate.toLocaleDateString('en', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </time>
+              <h3>{article.data.title}</h3>
+              <p>{article.data.description}</p>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <p class="text-muted">
+          No articles yet. Add an MDX file to <code>src/content/articles/</code>.
+        </p>
+      )}
+    </section>
+  </div>
 </SiteLayout>

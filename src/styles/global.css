@@ -1,5 +1,167 @@
 @import 'tailwindcss';
+@import './site.css';
 
 :root {
+  color-scheme: dark;
+
+  --background-base: #0b0f14;
+  --background-surface: #111821;
+  --background-elevated: #1b2632;
+  --border-subtle: #344354;
+
+  --text-primary: #f4f7fa;
+  --text-secondary: #c2cdd8;
+  --text-muted: #a3b1c0;
+
+  --accent: #c5a3ff;
+  --accent-hover: #d7bfff;
+  --accent-active: #ae82f2;
+  --accent-rgb: 197 163 255;
   --color-logo: #7928ca;
+
+  --success: #67d3a3;
+  --warning: #ffd166;
+  --error: #ff8a8a;
+
+  --background-base-rgb: 11 15 20;
+  --background-surface-rgb: 17 24 33;
+  --background-elevated-rgb: 27 38 50;
+  --text-primary-rgb: 244 247 250;
+  --text-secondary-rgb: 194 205 216;
+
+  --ridge-sage: #607884;
+  --ridge-blue: #4a6371;
+  --ridge-forest: #355749;
+  --ridge-pine: #263d33;
+  --ridge-night: #111821;
+  --ridge-haze: #0b0f14;
+  --ridge-blue-haze: #111821;
+  --ridge-forest-haze: #111821;
+  --ridge-pine-haze: #0b0f14;
+
+  --font-body: Arial, 'Noto Sans Hebrew', 'Segoe UI', sans-serif;
+  --font-heading: Arial, 'Noto Sans Hebrew', 'Segoe UI', sans-serif;
+  --font-code: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+
+  --type-display: clamp(3.25rem, 8vw, 6.5rem);
+  --type-h1: clamp(2.75rem, 6vw, 4.75rem);
+  --type-h2: clamp(2rem, 4vw, 3rem);
+  --type-h3: clamp(1.25rem, 2vw, 1.5rem);
+  --type-body-lg: 1.125rem;
+  --type-body: 1rem;
+  --type-small: 0.875rem;
+  --type-caption: 0.75rem;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+
+  --layout-container: 76rem;
+  --layout-reading: 48rem;
+  --section-space: clamp(4rem, 8vw, 8rem);
+  --grid-gap: 1rem;
+  --card-padding: 1.5rem;
+
+  --radius-control: 0.75rem;
+  --radius-card: 1.25rem;
+  --radius-panel: 1.75rem;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 1.5rem 4rem rgb(0 0 0 / 24%);
+  --glow-accent: 0 0 2.5rem rgb(var(--accent-rgb) / 12%);
+
+  --duration-fast: 140ms;
+  --duration-base: 220ms;
+  --duration-slow: 520ms;
+  --ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
+  --stagger-step: 60ms;
+
+  --z-base: 0;
+  --z-content: 1;
+  --z-sticky: 20;
+  --z-menu: 30;
+  --z-overlay: 50;
+}
+
+@theme {
+  --color-base: var(--background-base);
+  --color-surface: var(--background-surface);
+  --color-elevated: var(--background-elevated);
+  --color-line: var(--border-subtle);
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-cyan-100: var(--accent-hover);
+  --color-cyan-200: var(--accent-hover);
+  --color-cyan-300: var(--accent);
+  --color-cyan-400: var(--accent);
+  --color-cyan-500: var(--accent-active);
+  --color-cyan-600: var(--accent-active);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-heading);
+  --font-mono: var(--font-code);
+  --spacing: 0.25rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 20rem;
+  scroll-behavior: smooth;
+  background: var(--background-base);
+}
+
+body {
+  min-width: 20rem;
+  margin: 0;
+  background: var(--background-base);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: var(--type-body);
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+::selection {
+  background: rgb(var(--accent-rgb) / 28%);
+  color: var(--text-primary);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

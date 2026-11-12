@@ -182,7 +182,7 @@ export default function TutorialDialog({ open, onClose }: Props) {
                     }}
                     type="checkbox"
                   />
-                  <span>Don’t need the tutorial — hide it for this browser session</span>
+                  <span>Don’t need the tutorial - hide it for this browser session</span>
                 </label>
                 <div className="ml-auto flex items-center gap-2">
                   {step > 0 && (

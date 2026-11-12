@@ -48,7 +48,7 @@ export default function MVCCSandbox() {
           setLatestRead('$120');
           setEvents((items) => [
             ...items,
-            'T2 reads uncommitted $120 — dirty read; value could disappear if T1 rolls back.',
+            'T2 reads uncommitted $120 - dirty read; value could disappear if T1 rolls back.',
           ]);
         } else {
           setLatestRead('$100');
