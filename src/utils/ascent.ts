@@ -98,30 +98,6 @@ const initializeRoute = (page: HTMLElement) => {
   );
 };
 
-const initializeCounts = (page: HTMLElement, enabled: boolean) => {
-  if (!enabled) return;
-
-  page.querySelectorAll<HTMLElement>('[data-count-to]').forEach((counter) => {
-    const target = Number(counter.dataset.countTo);
-    if (!Number.isFinite(target)) return;
-    observeOnce(
-      counter.closest('.ascent-stat') ?? counter,
-      () => {
-        counter.textContent = '0';
-        const controls = animate(0, target, {
-          duration: 1.4,
-          ease: [0.2, 0.7, 0.2, 1],
-          onUpdate: (current) => {
-            counter.textContent = String(Math.round(current));
-          },
-        });
-        addCleanup(() => controls.stop());
-      },
-      0.5,
-    );
-  });
-};
-
 const initializeScrollEffects = (page: HTMLElement) => {
   const altitude = page.querySelector<HTMLElement>('[data-altitude-value]');
   const updateScroll = scroll((progress) => {
@@ -175,8 +151,6 @@ const initializeScrollEffects = (page: HTMLElement) => {
 const initializePointerEffects = (page: HTMLElement, reducedMotion: boolean) => {
   if (reducedMotion || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
-  const cursor = page.querySelector<HTMLElement>('[data-custom-cursor]');
-  const canUseCursor = Boolean(cursor && window.matchMedia('(min-width: 64rem)').matches);
   const isRtl = document.documentElement.dir === 'rtl';
 
   const onPointerMove = (event: PointerEvent) => {
@@ -190,15 +164,6 @@ const initializePointerEffects = (page: HTMLElement, reducedMotion: boolean) => 
       card.style.setProperty('--spot-x', `${x * 100}%`);
       card.style.setProperty('--spot-y', `${y * 100}%`);
     });
-
-    if (canUseCursor && cursor) {
-      cursor.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0) translate(-50%, -50%)`;
-      cursor.classList.add('is-visible');
-      cursor.classList.toggle(
-        'is-hovering',
-        Boolean((event.target as Element).closest('a, button')),
-      );
-    }
   };
 
   const resetPointer = () => {
@@ -206,7 +171,6 @@ const initializePointerEffects = (page: HTMLElement, reducedMotion: boolean) => 
       card.style.setProperty('--tilt-x', '0deg');
       card.style.setProperty('--tilt-y', '0deg');
     });
-    cursor?.classList.remove('is-visible', 'is-hovering');
   };
 
   page.addEventListener('pointermove', onPointerMove, { passive: true });
@@ -258,7 +222,6 @@ export const initializeAscent = () => {
 
   initializeReveals(page);
   initializeRoute(page);
-  initializeCounts(page, window.matchMedia('(min-width: 48rem)').matches);
   initializeScrollEffects(page);
   initializePointerEffects(page, reducedMotion);
   page.classList.add('is-enhanced');

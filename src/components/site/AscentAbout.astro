@@ -74,13 +74,6 @@ const sections = [
   { id: 'contact', label: 'Summit', altitude: '2,519' },
 ];
 
-const stats = [
-  { target: '3', suffix: '×', label: 'תפוקת כלים' },
-  { target: '90', suffix: '%', label: 'פחות קריסות OOM' },
-  { target: '200', end: '5', suffix: ' ms', label: 'זמן תזמון' },
-  { target: '15', suffix: '%', label: 'פחות דיווח ידני' },
-];
-
 const principles = [
   {
     number: '01 / אמינות',
@@ -106,13 +99,8 @@ const principles = [
 <div class="ascent-page" data-ascent-page>
   <div aria-hidden="true" class="ascent-progress"></div>
   <div aria-hidden="true" class="ascent-atmosphere"></div>
-  <div aria-hidden="true" class="ascent-cursor" data-custom-cursor></div>
 
   <nav aria-label="Altitude navigation" class="ascent-meter">
-    <a aria-label="Back to the top" class="ascent-meter__summit" href="#intro">
-      <span aria-hidden="true">▲</span>
-      <span>Top</span>
-    </a>
     <div class="ascent-meter__track">
       <span class="ascent-meter__fill" data-meter-fill></span>
       {sections.map((section) => (
@@ -259,32 +247,6 @@ const principles = [
           </div>
           <figcaption>דרך טובה מתחילה בצעד אחד, ונבנית צעד אחרי צעד.</figcaption>
         </figure>
-
-        <div aria-labelledby="ascent-stats-title" class="ascent-stats" role="group">
-          <h3 class="sr-only" id="ascent-stats-title">
-            הישגים נבחרים
-          </h3>
-          {stats.map((stat, index) => (
-            <article class="ascent-stat" data-reveal style={`--stagger:${index}`}>
-              <strong aria-hidden="true" class="ascent-stat__number" dir="ltr">
-                <span data-count-to={stat.target}>{stat.target}</span>
-                {stat.end && (
-                  <>
-                    <span class="ascent-stat__arrow">→</span>
-                    <span data-count-to={stat.end}>{stat.end}</span>
-                  </>
-                )}
-                {stat.suffix}
-              </strong>
-              <span class="sr-only">
-                {stat.end
-                  ? `קיצור זמן התזמון מ־${stat.target} ל־${stat.end} מילישניות`
-                  : `${stat.target}${stat.suffix === '×' ? ' פעמים' : '%'} ${stat.label}`}
-              </span>
-              <span class="ascent-stat__label">{stat.label}</span>
-            </article>
-          ))}
-        </div>
       </div>
     </section>
 
