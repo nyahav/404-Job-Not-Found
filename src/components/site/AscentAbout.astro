@@ -45,6 +45,9 @@ const experience = [
   },
 ];
 
+const routePath =
+  'M76 0C70 82 48 110 35 174S26 278 60 337s43 90 14 150S28 594 34 665s25 93 47 143-2 127-9 192';
+
 const skillGroups = [
   {
     number: '01',
@@ -283,24 +286,22 @@ const principles = [
             preserveAspectRatio="none"
             viewBox="0 0 100 1000"
           >
+            <path aria-hidden="true" class="ascent-route__shadow" d={routePath} pathLength="1" />
+            <path class="ascent-route__line" d={routePath} pathLength="1" data-route-line />
             <path
-              class="ascent-route__shadow"
-              d="M76 0C70 82 48 110 35 174S26 278 60 337s43 90 14 150S28 594 34 665s25 93 47 143-2 127-9 192"
+              class="ascent-route__pulse-trail"
+              d={routePath}
               pathLength="1"
+              data-route-pulse-trail
             />
-            <path
-              class="ascent-route__line"
-              d="M76 0C70 82 48 110 35 174S26 278 60 337s43 90 14 150S28 594 34 665s25 93 47 143-2 127-9 192"
-              pathLength="1"
-              data-route-line
-            />
+            <path class="ascent-route__pulse" d={routePath} pathLength="1" data-route-pulse />
           </svg>
           <div class="ascent-route__stops">
             {experience.map((job, index) => (
               <article
                 class:list={['ascent-stop', index % 2 === 1 && 'ascent-stop--offset']}
                 data-reveal
-                data-route-progress={((index + 1) / experience.length).toFixed(2)}
+                data-route-stop
               >
                 <span aria-hidden="true" class="ascent-stop__marker">
                   <span>{String(index + 1).padStart(2, '0')}</span>
