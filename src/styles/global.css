@@ -4,94 +4,162 @@
 :root {
   color-scheme: dark;
 
-  --background-base: #0b0f14;
-  --background-surface: #111821;
-  --background-elevated: #1b2632;
-  --border-subtle: #344354;
+  --background-base: #07111c;
+  --background-surface: #0d1c2a;
+  --background-elevated: #14283a;
+  --border-subtle: #294052;
 
-  --text-primary: #f4f7fa;
-  --text-secondary: #c2cdd8;
-  --text-muted: #a3b1c0;
+  --text-primary: #f1f6f8;
+  --text-secondary: #cad8e1;
+  --text-muted: #a5b8c5;
 
-  --accent: #c5a3ff;
-  --accent-hover: #d7bfff;
-  --accent-active: #ae82f2;
-  --accent-rgb: 197 163 255;
+  --accent: #ffb574;
+  --accent-hover: #ffc891;
+  --accent-active: #e89155;
+  --accent-rgb: 255 181 116;
+  --accent-ice: #91c9dd;
+  --accent-ice-rgb: 145 201 221;
   --color-logo: #7928ca;
 
-  --success: #67d3a3;
-  --warning: #ffd166;
-  --error: #ff8a8a;
+  --success: #78d6b1;
+  --warning: #ffd17a;
+  --error: #ff9292;
 
-  --background-base-rgb: 11 15 20;
-  --background-surface-rgb: 17 24 33;
-  --background-elevated-rgb: 27 38 50;
-  --text-primary-rgb: 244 247 250;
-  --text-secondary-rgb: 194 205 216;
+  --text-on-accent: #26160b;
+  --sky-pre-dawn: #101f2a;
+  --sky-dawn: #091824;
+  --sky-dawn-mid: #0b1c2a;
+  --sky-sunrise: #102334;
+  --sky-high: #091824;
+  --sky-project: #101b2a;
+  --sky-twilight: #0b1825;
+  --sky-summit: #091824;
+  --ridge-route: #0c1c29;
+  --ridge-middle: #315b68;
+  --ridge-near: #1b3d4b;
 
-  --ridge-sage: #607884;
-  --ridge-blue: #4a6371;
-  --ridge-forest: #355749;
-  --ridge-pine: #263d33;
-  --ridge-night: #111821;
-  --ridge-haze: #0b0f14;
-  --ridge-blue-haze: #111821;
-  --ridge-forest-haze: #111821;
-  --ridge-pine-haze: #0b0f14;
+  --background-base-rgb: 7 17 28;
+  --background-surface-rgb: 13 28 42;
+  --background-elevated-rgb: 20 40 58;
+  --text-primary-rgb: 241 246 248;
+  --text-secondary-rgb: 202 216 225;
+  --fog-glacier-rgb: 194 222 229;
 
-  --font-body: Arial, 'Noto Sans Hebrew', 'Segoe UI', sans-serif;
-  --font-heading: Arial, 'Noto Sans Hebrew', 'Segoe UI', sans-serif;
+  --ridge-sage: #607d8b;
+  --ridge-blue: #3d6478;
+  --ridge-forest: #294f56;
+  --ridge-pine: #183541;
+  --ridge-night: #0d1c2a;
+  --ridge-haze: #07111c;
+  --ridge-blue-haze: #0d1c2a;
+  --ridge-forest-haze: #0d1c2a;
+  --ridge-pine-haze: #07111c;
+
+  --font-body: 'Heebo', 'Assistant', Arial, 'Segoe UI', sans-serif;
+  --font-heading: 'Rubik', 'Heebo', Arial, 'Segoe UI', sans-serif;
+  --font-editorial: 'Frank Ruhl Libre', 'Rubik', 'Heebo', serif;
   --font-code: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
 
-  --type-display: clamp(3.25rem, 8vw, 6.5rem);
-  --type-h1: clamp(2.75rem, 6vw, 4.75rem);
-  --type-h2: clamp(2rem, 4vw, 3rem);
-  --type-h3: clamp(1.25rem, 2vw, 1.5rem);
-  --type-body-lg: 1.125rem;
-  --type-body: 1rem;
-  --type-small: 0.875rem;
-  --type-caption: 0.75rem;
+  --type-display-size: clamp(4.5rem, 13vw, 11rem);
+  --type-h1-size: clamp(3.5rem, 8vw, 7rem);
+  --type-h2-size: clamp(2rem, 4.5vw, 4rem);
+  --type-h3-size: clamp(1.35rem, 2vw, 1.75rem);
+  --type-body-lg-size: 1.125rem;
+  --type-body-size: 1rem;
+  --type-small-size: 0.875rem;
+  --type-caption-size: 0.75rem;
+  --type-display: var(--type-display-size);
+  --type-h1: var(--type-h1-size);
+  --type-h2: var(--type-h2-size);
+  --type-h3: var(--type-h3-size);
+  --type-body-lg: var(--type-body-lg-size);
+  --type-body: var(--type-body-size);
+  --type-small: var(--type-small-size);
+  --type-caption: var(--type-caption-size);
 
-  --space-1: 0.25rem;
-  --space-2: 0.5rem;
-  --space-3: 0.75rem;
-  --space-4: 1rem;
-  --space-6: 1.5rem;
-  --space-8: 2rem;
-  --space-12: 3rem;
-  --space-16: 4rem;
-  --space-24: 6rem;
-  --space-32: 8rem;
+  --type-display-weight: 500;
+  --type-h1-weight: 600;
+  --type-h2-weight: 600;
+  --type-h3-weight: 600;
+  --type-body-lg-weight: 400;
+  --type-body-weight: 400;
+  --type-small-weight: 500;
+  --type-caption-weight: 500;
+  --type-display-line-height: 0.9;
+  --type-h1-line-height: 1;
+  --type-h2-line-height: 1.12;
+  --type-h3-line-height: 1.25;
+  --type-body-lg-line-height: 1.65;
+  --type-body-line-height: 1.6;
+  --type-small-line-height: 1.45;
+  --type-caption-line-height: 1.4;
+  --type-display-letter-spacing: -0.035em;
+  --type-h1-letter-spacing: -0.025em;
+  --type-h2-letter-spacing: -0.02em;
+  --type-h3-letter-spacing: -0.01em;
+  --type-body-lg-letter-spacing: 0;
+  --type-body-letter-spacing: 0;
+  --type-small-letter-spacing: 0.005em;
+  --type-caption-letter-spacing: 0.04em;
 
-  --layout-container: 76rem;
-  --layout-reading: 48rem;
-  --section-space: clamp(4rem, 8vw, 8rem);
-  --grid-gap: 1rem;
-  --card-padding: 1.5rem;
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2rem;
+  --space-6: 3rem;
+  --space-8: 4rem;
+  --space-12: 6rem;
+  --space-16: 8rem;
+  --space-24: 12rem;
+  --space-32: 16rem;
 
-  --radius-control: 0.75rem;
-  --radius-card: 1.25rem;
-  --radius-panel: 1.75rem;
+  --layout-container: 82rem;
+  --layout-reading: 46rem;
+  --section-space: clamp(5rem, 10vw, 10rem);
+  --grid-gap: 1.5rem;
+  --card-padding: 2rem;
+
+  --radius-control: 0.5rem;
+  --radius-card: 0.875rem;
+  --radius-panel: 1.25rem;
   --radius-pill: 999px;
 
-  --shadow-card: 0 1.5rem 4rem rgb(0 0 0 / 24%);
-  --glow-accent: 0 0 2.5rem rgb(var(--accent-rgb) / 12%);
+  --shadow-card: 0 2rem 5rem rgb(0 0 0 / 38%);
+  --glow-accent: 0 0 4rem rgb(var(--accent-rgb) / 17%);
+  --glow-ice: 0 0 4rem rgb(var(--accent-ice-rgb) / 15%);
 
-  --duration-fast: 140ms;
-  --duration-base: 220ms;
-  --duration-slow: 520ms;
+  --duration-fast: 160ms;
+  --duration-base: 320ms;
+  --duration-slow: 780ms;
   --ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --ease-emphasized: cubic-bezier(0.16, 1, 0.3, 1);
-  --stagger-step: 60ms;
+  --ease-emphasized: cubic-bezier(0.77, 0, 0.175, 1);
+  --stagger-step: 90ms;
 
   --z-base: 0;
   --z-content: 1;
   --z-sticky: 20;
   --z-menu: 30;
   --z-overlay: 50;
+  --z-cursor: 60;
 }
 
 @theme {
+  --text-display: var(--type-display-size);
+  --text-display--line-height: var(--type-display-line-height);
+  --text-h1: var(--type-h1-size);
+  --text-h1--line-height: var(--type-h1-line-height);
+  --text-h2: var(--type-h2-size);
+  --text-h2--line-height: var(--type-h2-line-height);
+  --text-h3: var(--type-h3-size);
+  --text-h3--line-height: var(--type-h3-line-height);
+  --text-body-lg: var(--type-body-lg-size);
+  --text-body-lg--line-height: var(--type-body-lg-line-height);
+  --text-body: var(--type-body-size);
+  --text-body--line-height: var(--type-body-line-height);
+  --text-small: var(--type-small-size);
+  --text-small--line-height: var(--type-small-line-height);
+  --text-caption: var(--type-caption-size);
+  --text-caption--line-height: var(--type-caption-line-height);
   --color-base: var(--background-base);
   --color-surface: var(--background-surface);
   --color-elevated: var(--background-elevated);
@@ -101,6 +169,11 @@
   --color-muted: var(--text-muted);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
+  --color-sunrise: var(--accent);
+  --color-glacier: var(--accent-ice);
+  --color-sky-night: var(--sky-pre-dawn);
+  --color-sky-dawn: var(--sky-dawn);
+  --color-sky-summit: var(--sky-summit);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-error: var(--error);
@@ -160,8 +233,37 @@ button {
   color: var(--text-primary);
 }
 
+::view-transition-old(root) {
+  animation: ascent-fog-out 360ms var(--ease-standard) both;
+}
+
+::view-transition-new(root) {
+  animation: ascent-fog-in 800ms var(--ease-emphasized) both;
+}
+
+@keyframes ascent-fog-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ascent-fog-in {
+  from {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  to {
+    clip-path: inset(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
   }
 }

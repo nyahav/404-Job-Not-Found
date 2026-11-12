@@ -13,8 +13,7 @@ interface Props {
 import { ClientRouter } from 'astro:transitions';
 import '../styles/global.css';
 import SiteFooter from '../components/site/SiteFooter.astro';
-import SiteNavbar from '../components/site/SiteNavbar';
-import SiteMotion from '../components/site/SiteMotion';
+import SiteNavbar from '../components/site/SiteNavbar.astro';
 
 const {
   title,
@@ -38,8 +37,15 @@ const basePath = import.meta.env.BASE_URL.endsWith('/')
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700&family=Heebo:wght@400;500;600;700&family=Rubik:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="icon" type="image/svg+xml" href={`${basePath}favicon.svg?v=20261111-2`} />
     <title>{title}</title>
+    <slot name="head" />
     <ClientRouter />
   </head>
   <body
@@ -56,17 +62,13 @@ const basePath = import.meta.env.BASE_URL.endsWith('/')
       currentPath={Astro.url.pathname}
       aboutLabel={aboutLabel}
       articlesLabel={articlesLabel}
-      client:load
-      transition:persist
     />
     <main
       class:list={['site-main mx-auto', wide ? 'max-w-none' : 'max-w-5xl px-6 py-16 sm:py-24']}
       id="main-content"
-      transition:animate="none"
     >
       <slot />
     </main>
     <SiteFooter basePath={basePath} />
-    <SiteMotion client:load transition:persist />
   </body>
 </html>

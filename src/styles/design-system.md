@@ -1,4 +1,4 @@
-# Job Not Found design system
+# Job Not Found — The Ascent design system
 
 The shared tokens live in `global.css`; use the CSS custom properties in CSS and
 the matching Tailwind v4 utilities (`bg-base`, `bg-surface`, `text-primary`,
@@ -7,32 +7,42 @@ the token file only.
 
 ## Foundations
 
-- **Surfaces:** base `#0b0f14`, surface `#111821`, elevated `#1b2632`, border
-  `#344354`.
-- **Text:** primary `#f4f7fa`, secondary `#c2cdd8`, muted `#a3b1c0`.
-- **Accent:** brand violet `#c5a3ff`; hover `#d7bfff`; active `#ae82f2`.
-- **Semantic:** success `#67d3a3`, warning `#ffd166`, error `#ff8a8a`.
-- **Typography:** Arial with Noto Sans Hebrew and Segoe UI fallbacks; monospace
-  is reserved for technical labels. Headings use a fluid display-to-h3 scale.
-- **Spacing:** 4px base, named steps from 4px to 128px. Sections use
-  `--section-space`; content uses the 76rem container and 48rem reading width.
-- **Shape:** 12px controls, 20px cards, 28px panels, and pill-shaped chips.
-- **Depth:** one restrained card shadow and a low-opacity accent glow.
-- **Motion:** 140ms / 220ms / 520ms; standard and emphasized easing; 60ms stagger.
-  Animate opacity and transforms, and simplify or skip motion for reduced-motion
-  preferences.
-- **Layers:** base 0, content 1, sticky 20, menu 30, transition overlay 50.
+- **Alpine night:** base `#07111c`, surface `#0d1c2a`, elevated `#14283a`,
+  border `#294052`.
+- **Glacier text:** primary `#f1f6f8`, secondary `#cad8e1`, muted `#a5b8c5`.
+- **Sunrise accent:** amber `#ffb574`; hover `#ffc891`; active `#e89155`.
+- **Ice accent:** `#91c9dd` for wayfinding, route detail, and atmospheric glow.
+- **Semantic:** success `#78d6b1`, warning `#ffd17a`, error `#ff9292`.
+- **Typography:** Rubik headlines, Heebo body, Frank Ruhl Libre editorial accents;
+  each has a Hebrew-capable fallback. Technical labels use monospace.
+- **Type scale:** display, h1, h2, h3, body-lg, body, small, and caption each
+  have size, weight, line-height, and letter-spacing tokens. Display through h2
+  use fluid sizing from phone to desktop. Tailwind utilities include
+  `text-display`, `text-h1`, `text-h2`, `text-h3`, `text-body-lg`, `text-body`,
+  `text-small`, and `text-caption`.
+- **Spacing:** 8px base with named steps from 8px to 256px. Sections use
+  `--section-space`; content uses the 82rem container and 46rem reading width.
+- **Shape:** 8px controls, 14px cards, 20px panels, and pill-shaped chips.
+- **Depth:** deep neutral card shadow with restrained sunrise and ice glows.
+- **Motion:** 160ms / 320ms / 780ms; standard and emphasized easing; 90ms stagger.
+  Animate transform, opacity, clip-path, and SVG strokes only; remove parallax,
+  count-up, and cursor effects for reduced motion.
+- **Layers:** base 0, content 1, sticky 20, menu 30, overlay 50, cursor 60.
+- **Ascent colors:** section sky, ridgeline, and route colors are also declared
+  as CSS variables in `global.css`; SVG fills and page backgrounds reference
+  those variables rather than embedding colors in components.
 
 ## Usage rules
 
 1. Keep all page and component colors on these shared tokens. Use alpha variants
    with `rgb(var(--*-rgb) / <alpha>)`.
-2. Keep body text at 16px or larger. Use secondary/muted text only where the
-   contrast check against its surface remains at least WCAG AA (4.5:1).
+2. Keep body text at 16px or larger. Check primary and secondary text on all
+   surfaces for WCAG AA contrast; reserve muted color for decorative metadata.
 3. Use the same container, section spacing, card padding, and grid gap across
    routes; do not introduce arbitrary spacing values.
-4. Prefer one accent color. Use semantic colors only to express status.
-   Existing cyan utility classes resolve to the shared violet accent tokens so
-   interactive labs and the portfolio chrome stay visually consistent.
-5. Motion should be brief, transform/opacity-only, and never required to reveal
-   readable content.
+4. Use sunrise amber as the CTA and emphasis color; use glacier ice as a
+   secondary wayfinding color. Keep semantic colors limited to status.
+5. Motion is progressive enhancement: every text and image must be available
+   without JavaScript and when reduced motion is enabled. The About page uses
+   vanilla Motion for scroll reveals and parallax, plus CSS for Astro view
+   transitions; reduced motion removes parallax, counters, and the custom cursor.

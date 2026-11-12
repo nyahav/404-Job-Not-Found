@@ -1,0 +1,723 @@
+---
+import { Image } from 'astro:assets';
+import ContourLines from './ContourLines.astro';
+import seceda from '../../assets/mountains/seceda.jpg';
+import mountainClouds from '../../assets/mountains/mountain-clouds.jpg';
+import mountainTrail from '../../assets/mountains/mountain-trail.jpg';
+import { buildRidge, type RidgeOptions } from '../../utils/ridges';
+import '../../styles/about-ascent.css';
+
+const basePath = import.meta.env.BASE_URL.endsWith('/')
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+
+const experience = [
+  {
+    role: 'מהנדס תוכנה',
+    company: 'PTBox',
+    period: 'יוני 2025 – היום',
+    highlights: [
+      'תכנון שירות תזמור מרכזי שהגדיל את תפוקת הכלים פי 3 והפחית את זמן התזמון מ־200 ל־5 מילישניות, באמצעות מתזמן משוקלל ומטמון בזיכרון.',
+      'הפחתת קריסות OOM של קונטיינרים בכ־90% באמצעות בקרת קבלה היברידית, תעדוף משימות ומנגנון התאוששות מבוסס Docker.',
+      'הובלת מעבר ממערכת SQL ותיקה לארכיטקטורת SQL/NoSQL היברידית, ושילוב אימות משתמשים אחוד מבוסס Keycloak בשירותי Python ו־Kotlin.',
+    ],
+  },
+  {
+    role: 'מהנדס תמיכה',
+    company: 'Base44',
+    period: 'פברואר 2025 – יוני 2025',
+    highlights: [
+      'אבחון תקלות API ואינטגרציה ב־React וב־JavaScript, איתור גורמי שורש והעברת ממצאים הניתנים לשחזור.',
+    ],
+  },
+  {
+    role: 'אנליסט נתונים',
+    company: 'HR Signal',
+    period: 'יוני 2024 – פברואר 2025',
+    highlights: [
+      'ניתוח נתונים ב־BigQuery ובניית אוטומציות סטטיסטיות ב־Python, שהפחיתו ב־15% את עבודת הדיווח הידנית החוזרת.',
+    ],
+  },
+  {
+    role: 'מהנדס NOC',
+    company: 'Check Point Software',
+    period: 'דצמבר 2022 – פברואר 2024',
+    highlights: ['פתרון תקלות Linux ורשתות ושיפור תהליך ההטמעה, שקיצר את זמן האינטגרציה ב־30%.'],
+  },
+];
+
+const skillGroups = [
+  {
+    number: '01',
+    title: 'שפות ופיתוח',
+    skills: 'Python, FastAPI, Java, Kotlin, JavaScript, TypeScript, React',
+  },
+  {
+    number: '02',
+    title: 'תשתיות וענן',
+    skills: 'Docker, Kubernetes, RabbitMQ, AWS, GCP, Helm, Terraform, GitHub Actions',
+  },
+  {
+    number: '03',
+    title: 'מערכות ונתונים',
+    skills: 'מערכות מבוזרות, תכנון API, PostgreSQL, MySQL, MongoDB, BigQuery',
+  },
+];
+
+type RidgeLayer = RidgeOptions & {
+  id: string;
+  depth: number;
+  crest: string;
+  haze: string;
+  hold?: number;
+  trees?: { w: number; h: number; gap?: number; edgeBoost?: boolean };
+};
+
+const ridgeLayers: RidgeLayer[] = [
+  {
+    id: 'far',
+    depth: 0.16,
+    crest: 'var(--ridge-sage)',
+    haze: 'var(--sky-sunrise)',
+    seed: 11,
+    base: 420,
+    amp: 275,
+    peaks: 5,
+    sharp: 1.05,
+    crag: 0.07,
+    rough: 10,
+  },
+  {
+    id: 'blue',
+    depth: 0.32,
+    crest: 'var(--ridge-blue)',
+    haze: 'var(--ridge-pine)',
+    seed: 47,
+    base: 438,
+    amp: 230,
+    peaks: 6,
+    sharp: 1.15,
+    crag: 0.06,
+    rough: 9,
+  },
+  {
+    id: 'middle',
+    depth: 0.54,
+    crest: 'var(--ridge-forest)',
+    haze: 'var(--ridge-night)',
+    seed: 23,
+    base: 454,
+    amp: 185,
+    peaks: 6,
+    sharp: 1.3,
+    crag: 0.045,
+    rough: 7,
+  },
+  {
+    id: 'near',
+    depth: 0.76,
+    crest: 'var(--ridge-pine)',
+    haze: 'var(--background-base)',
+    seed: 91,
+    base: 468,
+    amp: 135,
+    peaks: 7,
+    sharp: 1.9,
+    crag: 0.02,
+    rough: 4,
+    trees: { w: 4, h: 11, gap: 0.7 },
+  },
+  {
+    id: 'front',
+    depth: 1,
+    crest: 'var(--ridge-night)',
+    haze: 'var(--background-base)',
+    hold: 0.9,
+    seed: 5,
+    base: 480,
+    amp: 48,
+    peaks: 4,
+    sharp: 1.6,
+    crag: 0.01,
+    rough: 2,
+    trees: { w: 9, h: 72, gap: 1.5, edgeBoost: true },
+  },
+];
+const ridges = ridgeLayers.map((layer) => ({ ...layer, ...buildRidge(layer) }));
+
+const sections = [
+  { id: 'intro', label: 'ראשי', altitude: '000' },
+  { id: 'about', label: 'עליי', altitude: '360' },
+  { id: 'journey', label: 'ניסיון', altitude: '820' },
+  { id: 'toolkit', label: 'כלים', altitude: '1,400' },
+  { id: 'project', label: 'פרויקט', altitude: '1,900' },
+  { id: 'values', label: 'עקרונות', altitude: '2,200' },
+  { id: 'education', label: 'השכלה', altitude: '2,420' },
+  { id: 'contact', label: 'פסגה', altitude: '2,519' },
+];
+
+const stats = [
+  { target: '3', suffix: '×', label: 'תפוקת כלים' },
+  { target: '90', suffix: '%', label: 'פחות קריסות OOM' },
+  { target: '200', end: '5', suffix: ' ms', label: 'זמן תזמון' },
+  { target: '15', suffix: '%', label: 'פחות דיווח ידני' },
+];
+
+const principles = [
+  {
+    number: '01 / אמינות',
+    title: 'מערכות שאפשר לסמוך עליהן.',
+    description: 'תכנון שמביא בחשבון כשלים, עומסים, והתאוששות — עוד לפני שהם מגיעים לייצור.',
+    shape: 'summit',
+  },
+  {
+    number: '02 / בהירות',
+    title: 'להפוך את המורכב לפשוט.',
+    description: 'חשיבה מערכתית ופרטים קטנים שמקלים על אנשים להבין, לתחזק, ולהמשיך לבנות.',
+    shape: 'contour',
+  },
+  {
+    number: '03 / עבודת צוות',
+    title: 'לבנות טוב יותר, ביחד.',
+    description: 'סקרנות, למידה, אחריות, ותקשורת טובה לאורך כל הדרך.',
+    shape: 'horizon',
+  },
+];
+---
+
+<div class="ascent-page" data-ascent-page>
+  <div aria-hidden="true" class="ascent-progress"></div>
+  <div aria-hidden="true" class="ascent-atmosphere"></div>
+  <div aria-hidden="true" class="ascent-cursor" data-custom-cursor></div>
+
+  <nav aria-label="ניווט לפי גובה" class="ascent-meter">
+    <a aria-label="חזרה לראש המסלול" class="ascent-meter__summit" href="#intro">
+      <span aria-hidden="true">▲</span>
+      <span>פסגה</span>
+    </a>
+    <div class="ascent-meter__track">
+      <span class="ascent-meter__fill" data-meter-fill></span>
+      {sections.map((section) => (
+        <a
+          aria-label={`${section.label}, גובה ${section.altitude} מטר`}
+          class="ascent-meter__tick"
+          data-meter-stop={section.id}
+          href={`#${section.id}`}
+          style={`--tick-progress:${Number(section.altitude.replace(',', '')) / 2519}`}
+        />
+      ))}
+    </div>
+    <output aria-label="גובה נוכחי במטרים" class="ascent-meter__reading" data-altitude>
+      <span data-altitude-value>0</span>
+      <span class="ascent-meter__unit">מ׳</span>
+    </output>
+    <span aria-live="polite" class="ascent-meter__label" data-current-section>
+      ראשי
+    </span>
+    <span class="ascent-meter__total">2,519 מ׳</span>
+  </nav>
+
+  <section
+    aria-labelledby="about-hero-title"
+    class="ascent-hero ascent-section"
+    data-ascent-section
+    data-climate="night"
+    data-section-label="ראשי"
+    id="intro"
+  >
+    <Image
+      alt="זריחה מעל רכס סקדה בהרי הדולומיטים"
+      class="ascent-hero__image"
+      fetchpriority="high"
+      format="webp"
+      loading="eager"
+      quality={84}
+      sizes="100vw"
+      src={seceda}
+      widths={[768, 1280, 1920]}
+    />
+    <div aria-hidden="true" class="ascent-hero__veil"></div>
+    <div aria-hidden="true" class="ascent-hero__grain"></div>
+    <div aria-hidden="true" class="ascent-hero__coordinates" dir="ltr">
+      46°35′ N <span>—</span> 11°43′ E
+    </div>
+
+    <div aria-hidden="true" class="ascent-hero__skyline">
+      <div class="ascent-hero__glow"></div>
+      {ridges.map((ridge, index) => (
+        <div
+          class="ascent-ridge"
+          data-ridge
+          style={`--ridge-depth:${ridge.depth};--ridge-index:${index}`}
+        >
+          <svg
+            aria-hidden="true"
+            class="ascent-ridge__shape"
+            focusable="false"
+            preserveAspectRatio="xMidYMax slice"
+            viewBox="0 0 1600 480"
+          >
+            <path d={ridge.d} fill={ridge.crest} />
+          </svg>
+        </div>
+      ))}
+      <div class="ascent-fog ascent-fog--one"></div>
+      <div class="ascent-fog ascent-fog--two"></div>
+    </div>
+
+    <div class="ascent-hero__content">
+      <p class="ascent-kicker" data-reveal>
+        <span class="ascent-kicker__line"></span>
+        <span>יומן מסע · דולומיטים · 2,519 מ׳</span>
+      </p>
+      <h1 class="ascent-hero__title" id="about-hero-title" aria-label="יהב ניר">
+        <span class="ascent-title-mask">
+          <span>יהב</span>
+        </span>
+        <span class="ascent-title-mask ascent-title-mask--last">
+          <span>
+            ניר<span class="ascent-sun-dot">.</span>
+          </span>
+        </span>
+      </h1>
+      <p class="ascent-hero__role" data-reveal>
+        מהנדס תוכנה, בונה מערכות שאפשר לסמוך עליהן.
+      </p>
+      <p class="ascent-hero__intro" data-reveal>
+        אני מתכנן ומפתח שירותי Backend ומערכות מבוזרות - עם אהבה לביצועים, לאמינות, ולפרטים הקטנים
+        שעושים מערכת טובה למערכת מצוינת.
+      </p>
+      <div class="ascent-hero__actions" data-reveal>
+        <a class="ascent-button ascent-button--sun" href="#journey">
+          <span>מתחילים לטפס</span>
+          <span aria-hidden="true">↙</span>
+        </a>
+        <a
+          class="ascent-button ascent-button--ghost"
+          download="Yahav-Nir-Resume.pdf"
+          href={`${basePath}Yahav-Nir-Resume.pdf`}
+        >
+          קורות חיים <span aria-hidden="true">↓</span>
+        </a>
+      </div>
+    </div>
+
+    <div aria-hidden="true" class="ascent-hero__index">
+      <span>01</span>
+      <span class="ascent-hero__index-rule"></span>
+      <span>08</span>
+    </div>
+    <a aria-label="גלילה לתוכן" class="ascent-scroll-cue" href="#about">
+      <span>לגלול ולגלות</span>
+      <span aria-hidden="true" class="ascent-scroll-cue__line"></span>
+    </a>
+  </section>
+
+  <div class="ascent-main">
+    <section
+      aria-labelledby="about-story-title"
+      class="ascent-about ascent-section"
+      data-ascent-section
+      data-climate="dawn"
+      data-section-label="עליי"
+      id="about"
+    >
+      <ContourLines />
+      <div class="ascent-container ascent-about__layout">
+        <div class="ascent-about__copy" data-reveal>
+          <p class="ascent-kicker ascent-kicker--ice">
+            <span class="ascent-kicker__line"></span>
+            <span>02 · תחילת המסלול</span>
+          </p>
+          <h2 class="ascent-heading" id="about-story-title">
+            בהירות נבנית
+            <span class="ascent-heading__accent">מהדברים הקטנים.</span>
+          </h2>
+          <p class="ascent-lead">
+            אני מהנדס תוכנה עם ניסיון בבניית שירותי Backend, שיפור אמינות מערכות ועבודה עם מערכות
+            מבוזרות.
+          </p>
+          <p class="ascent-copy">
+            אני נהנה לפתור בעיות מורכבות, לשפר ביצועים ולבנות שירותים יציבים שאפשר לסמוך עליהם.
+            בעיניי, הנדסה טובה מחברת בין חשיבה מערכתית, סקרנות, ויכולת להפוך את המורכב לפשוט.
+          </p>
+          <a class="ascent-text-link" dir="ltr" href="mailto:yahavnirr@gmail.com">
+            yahavnirr@gmail.com <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+        <figure class="ascent-photo ascent-photo--trail" data-reveal>
+          <div class="ascent-photo__frame">
+            <Image
+              alt="שביל הררי המתפתל בין רכסי הדולומיטים הירוקים"
+              class="ascent-photo__image"
+              data-photo-reveal
+              format="webp"
+              loading="lazy"
+              quality={78}
+              sizes="(max-width: 760px) 100vw, 48vw"
+              src={mountainTrail}
+              widths={[480, 720, 960]}
+            />
+            <span aria-hidden="true" class="ascent-photo__stamp">
+              46° / 11°
+            </span>
+          </div>
+          <figcaption>דרך טובה מתחילה בצעד אחד, ונבנית צעד אחרי צעד.</figcaption>
+        </figure>
+
+        <div aria-labelledby="ascent-stats-title" class="ascent-stats" role="group">
+          <h3 class="sr-only" id="ascent-stats-title">
+            הישגים נבחרים
+          </h3>
+          {stats.map((stat, index) => (
+            <article class="ascent-stat" data-reveal style={`--stagger:${index}`}>
+              <strong aria-hidden="true" class="ascent-stat__number" dir="ltr">
+                <span data-count-to={stat.target}>{stat.target}</span>
+                {stat.end && (
+                  <>
+                    <span class="ascent-stat__arrow">→</span>
+                    <span data-count-to={stat.end}>{stat.end}</span>
+                  </>
+                )}
+                {stat.suffix}
+              </strong>
+              <span class="sr-only">
+                {stat.end
+                  ? `קיצור זמן התזמון מ־${stat.target} ל־${stat.end} מילישניות`
+                  : `${stat.target}${stat.suffix === '×' ? ' פעמים' : '%'} ${stat.label}`}
+              </span>
+              <span class="ascent-stat__label">{stat.label}</span>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section
+      aria-labelledby="journey-title"
+      class="ascent-journey ascent-section"
+      data-ascent-section
+      data-climate="sunrise"
+      data-section-label="ניסיון"
+      id="journey"
+    >
+      <ContourLines />
+      <div class="ascent-container">
+        <header class="ascent-section-head" data-reveal>
+          <div>
+            <p class="ascent-kicker">
+              <span class="ascent-kicker__line"></span>
+              <span>03 · קו הרכס</span>
+            </p>
+            <h2 class="ascent-heading" id="journey-title">
+              המסע <span class="ascent-heading__accent">המקצועי.</span>
+            </h2>
+          </div>
+          <p class="ascent-section-head__aside">
+            ארבע תחנות. מסלול אחד של פתרון בעיות, אחריות וצמיחה.
+          </p>
+        </header>
+
+        <div class="ascent-route" data-route>
+          <svg
+            aria-hidden="true"
+            class="ascent-route__map"
+            fill="none"
+            preserveAspectRatio="none"
+            viewBox="0 0 100 1000"
+          >
+            <path
+              class="ascent-route__shadow"
+              d="M76 0C70 82 48 110 35 174S26 278 60 337s43 90 14 150S28 594 34 665s25 93 47 143-2 127-9 192"
+              pathLength="1"
+            />
+            <path
+              class="ascent-route__line"
+              d="M76 0C70 82 48 110 35 174S26 278 60 337s43 90 14 150S28 594 34 665s25 93 47 143-2 127-9 192"
+              pathLength="1"
+              data-route-line
+            />
+          </svg>
+          <div class="ascent-route__stops">
+            {experience.map((job, index) => (
+              <article
+                class:list={['ascent-stop', index % 2 === 1 && 'ascent-stop--offset']}
+                data-reveal
+                data-route-progress={((index + 1) / experience.length).toFixed(2)}
+              >
+                <span aria-hidden="true" class="ascent-stop__marker">
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                </span>
+                <div class="ascent-stop__card">
+                  <div class="ascent-stop__heading">
+                    <p class="ascent-stop__company" dir="ltr">
+                      {job.company}
+                    </p>
+                    <p class="ascent-stop__period">{job.period}</p>
+                  </div>
+                  <h3>{job.role}</h3>
+                  <ul>
+                    {job.highlights.map((highlight) => (
+                      <li>{highlight}</li>
+                    ))}
+                  </ul>
+                </div>
+              </article>
+            ))}
+          </div>
+          <span aria-hidden="true" class="ascent-route__summit">
+            ▲
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <section
+      aria-labelledby="toolkit-title"
+      class="ascent-toolkit ascent-section"
+      data-ascent-section
+      data-climate="high"
+      data-section-label="כלים"
+      id="toolkit"
+    >
+      <ContourLines />
+      <div class="ascent-container">
+        <header class="ascent-section-head" data-reveal>
+          <div>
+            <p class="ascent-kicker ascent-kicker--ice">
+              <span class="ascent-kicker__line"></span>
+              <span>04 · ציוד לטיפוס</span>
+            </p>
+            <h2 class="ascent-heading" id="toolkit-title">
+              הכלים הם <span class="ascent-heading__accent">רק ההתחלה.</span>
+            </h2>
+          </div>
+          <p class="ascent-section-head__aside">
+            הטכנולוגיה משתנה. היכולת לבחור את הכלי הנכון נשארת.
+          </p>
+        </header>
+        <div class="ascent-toolkit__grid">
+          {skillGroups.map((group, index) => (
+            <article
+              class:list={['ascent-tool-card', `ascent-tool-card--${index + 1}`]}
+              data-tilt
+              data-reveal
+            >
+              <span aria-hidden="true" class="ascent-tool-card__halo"></span>
+              <span class="ascent-tool-card__number">{group.number}</span>
+              <span aria-hidden="true" class="ascent-tool-card__mark">
+                {index === 0 ? 'λ' : index === 1 ? '⌘' : '∿'}
+              </span>
+              <h3>{group.title}</h3>
+              <p dir={group.number === '03' ? 'rtl' : 'ltr'}>{group.skills}</p>
+              <span aria-hidden="true" class="ascent-tool-card__arrow">
+                ↗
+              </span>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section
+      aria-labelledby="project-title"
+      class="ascent-project ascent-section"
+      data-ascent-section
+      data-climate="dusk"
+      data-section-label="פרויקט נבחר"
+      id="project"
+    >
+      <ContourLines />
+      <div class="ascent-container ascent-project__grid">
+        <div class="ascent-project__copy" data-reveal>
+          <p class="ascent-kicker">
+            <span class="ascent-kicker__line"></span>
+            <span>05 · נקודת תצפית</span>
+          </p>
+          <h2 class="ascent-heading" id="project-title">
+            תמיכה חכמה.
+            <span class="ascent-heading__accent">עם אדם בלולאה.</span>
+          </h2>
+          <p class="ascent-project__name">פלטפורמת תמיכת לקוחות מבוססת AI</p>
+          <p class="ascent-copy">
+            בניית תהליך עבודה מרובה סוכנים עם LangGraph,‏ FastAPI ו־Amazon Bedrock, הכולל RAG מודע
+            להקשר, ניתוח סנטימנט, ניתוב לפי רמת ביטחון והעברה לאיש צוות בעת הצורך באמצעות SageMaker
+            A2I. הפרויקט כולל גם פריסה מקומית ב־Kubernetes, ניטור ב־Prometheus וב־Grafana ותשתית AWS
+            EKS המנוהלת באמצעות Terraform.
+          </p>
+          <div aria-label="טכנולוגיות הפרויקט" class="ascent-tags" dir="ltr">
+            <span>LangGraph</span>
+            <span>FastAPI</span>
+            <span>Amazon Bedrock</span>
+            <span>Kubernetes</span>
+            <span>Terraform</span>
+          </div>
+        </div>
+        <div aria-hidden="true" class="ascent-orbit" data-reveal>
+          <div class="ascent-orbit__ring ascent-orbit__ring--outer"></div>
+          <div class="ascent-orbit__ring ascent-orbit__ring--inner"></div>
+          <div class="ascent-orbit__ring ascent-orbit__ring--fine"></div>
+          <div class="ascent-orbit__sun">AI</div>
+          <span class="ascent-orbit__node ascent-orbit__node--rag">RAG</span>
+          <span class="ascent-orbit__node ascent-orbit__node--a2i">A2I</span>
+          <span class="ascent-orbit__node ascent-orbit__node--api">API</span>
+          <span class="ascent-orbit__caption">HUMAN-CENTERED SYSTEMS</span>
+        </div>
+      </div>
+    </section>
+
+    <section
+      aria-labelledby="values-title"
+      class="ascent-values ascent-section"
+      data-ascent-section
+      data-climate="twilight"
+      data-section-label="עקרונות"
+      id="values"
+    >
+      <ContourLines />
+      <div class="ascent-container">
+        <header class="ascent-section-head" data-reveal>
+          <div>
+            <p class="ascent-kicker ascent-kicker--ice">
+              <span class="ascent-kicker__line"></span>
+              <span>06 · מה שנשאר איתי</span>
+            </p>
+            <h2 class="ascent-heading" id="values-title">
+              הנדסה טובה <span class="ascent-heading__accent">מרגישה פשוטה.</span>
+            </h2>
+          </div>
+          <span aria-hidden="true" class="ascent-values__altitude">
+            2,200 <small>מ׳</small>
+          </span>
+        </header>
+        <div class="ascent-values__grid">
+          {principles.map((principle) => (
+            <article class="ascent-principle" data-tilt data-reveal>
+              <span
+                aria-hidden="true"
+                class={`ascent-principle__art ascent-principle__art--${principle.shape}`}
+              >
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+              <span class="ascent-principle__number">{principle.number}</span>
+              <h3>{principle.title}</h3>
+              <p>{principle.description}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section
+      aria-labelledby="education-title"
+      class="ascent-education ascent-section"
+      data-ascent-section
+      data-climate="summit"
+      data-section-label="השכלה ושירות"
+      id="education"
+    >
+      <div class="ascent-closing-photo" data-photo-reveal>
+        <Image
+          alt="פסגת הרים עטופה בעננים ויער כהה למרגלותיה"
+          class="ascent-closing-photo__image"
+          format="webp"
+          loading="lazy"
+          quality={78}
+          sizes="100vw"
+          src={mountainClouds}
+          widths={[640, 960, 1280, 1920]}
+        />
+        <div aria-hidden="true" class="ascent-closing-photo__shade"></div>
+        <p data-reveal>הדרך חשובה לא פחות מהפסגה.</p>
+      </div>
+      <ContourLines />
+      <div class="ascent-container ascent-education__content">
+        <header class="ascent-section-head" data-reveal>
+          <div>
+            <p class="ascent-kicker">
+              <span class="ascent-kicker__line"></span>
+              <span>07 · היסודות</span>
+            </p>
+            <h2 class="ascent-heading" id="education-title">
+              יסודות <span class="ascent-heading__accent">להמשך הדרך.</span>
+            </h2>
+          </div>
+          <p class="ascent-section-head__aside">סקרנות, למידה, ועבודת צוות - בכל תחנה.</p>
+        </header>
+        <div class="ascent-education__grid">
+          <article class="ascent-education-card" data-reveal>
+            <span aria-hidden="true" class="ascent-education-card__symbol">
+              01
+            </span>
+            <p class="ascent-kicker ascent-kicker--ice">השכלה</p>
+            <h3>תואר ראשון במדעי המחשב</h3>
+            <p>האוניברסיטה הפתוחה · 2020–2024</p>
+          </article>
+          <article class="ascent-education-card" data-reveal>
+            <span aria-hidden="true" class="ascent-education-card__symbol">
+              02
+            </span>
+            <p class="ascent-kicker ascent-kicker--ice">שירות צבאי</p>
+            <h3>לוחם וחובש קרבי</h3>
+            <p>פלס״ר 7. הכשרת חיילים למצבי לחץ ופיתוח עבודת צוות, אחריות ויכולת הסתגלות.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section
+      aria-labelledby="contact-title"
+      class="ascent-contact ascent-section"
+      data-ascent-section
+      data-climate="night"
+      data-section-label="פסגה"
+      id="contact"
+    >
+      <ContourLines />
+      <div class="ascent-container ascent-contact__inner" data-reveal>
+        <p class="ascent-kicker ascent-kicker--ice">
+          <span class="ascent-kicker__line"></span>
+          <span>08 · הפסגה</span>
+        </p>
+        <h2 class="ascent-contact__title" id="contact-title">
+          נשאר משהו
+          <span>
+            לבנות<span class="ascent-sun-dot">.</span>
+          </span>
+        </h2>
+        <div class="ascent-contact__footer">
+          <p>נדבר?</p>
+          <div class="ascent-contact__actions">
+            <a
+              class="ascent-button ascent-button--sun ascent-magnetic"
+              dir="ltr"
+              href="mailto:yahavnirr@gmail.com"
+            >
+              yahavnirr@gmail.com <span aria-hidden="true">↗</span>
+            </a>
+            <a
+              class="ascent-button ascent-button--ghost ascent-magnetic"
+              href="https://www.linkedin.com/in/nir-yahav/"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              LinkedIn <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div aria-hidden="true" class="ascent-contact__coordinates" dir="ltr">
+        SUMMIT REACHED · 2,519 M
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  import { initializeAscent, resetAscent } from '../../utils/ascent';
+
+  document.addEventListener('astro:page-load', initializeAscent);
+  document.addEventListener('astro:before-swap', resetAscent);
+</script>

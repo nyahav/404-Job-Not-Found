@@ -1,0 +1,199 @@
+---
+interface Props {
+  basePath: string;
+  currentPath: string;
+  aboutLabel: string;
+  articlesLabel: string;
+}
+
+const { basePath, currentPath, aboutLabel, articlesLabel } = Astro.props;
+const normalizedBasePath = basePath.endsWith('/') ? basePath : `${basePath}/`;
+const links = [
+  { href: normalizedBasePath, label: 'Home', path: normalizedBasePath },
+  { href: `${normalizedBasePath}about/`, label: aboutLabel, path: `${normalizedBasePath}about/` },
+  {
+    href: `${normalizedBasePath}cloud-architect/`,
+    label: 'Cloud Architect',
+    path: `${normalizedBasePath}cloud-architect/`,
+  },
+  {
+    href: `${normalizedBasePath}database-explorer/`,
+    label: 'Database Explorer',
+    path: `${normalizedBasePath}database-explorer/`,
+  },
+  { href: `${normalizedBasePath}3-am/`, label: '3 AM Lab', path: `${normalizedBasePath}3-am/` },
+  {
+    href: `${normalizedBasePath}#articles`,
+    label: articlesLabel,
+    path: `${normalizedBasePath}#articles`,
+  },
+];
+
+const normalizedCurrentPath = currentPath.endsWith('/') ? currentPath : `${currentPath}/`;
+const isCurrent = (path: string) => {
+  const [destination, hash] = path.split('#');
+  if (hash) return false;
+  return (
+    normalizedCurrentPath === destination ||
+    (destination !== normalizedBasePath && normalizedCurrentPath.startsWith(destination))
+  );
+};
+---
+
+<header class="site-header" data-base-path={normalizedBasePath} data-scrolled="false">
+  <nav aria-label="ניווט ראשי" class="site-nav">
+    <a aria-label="404 Job Not Found — דף הבית" class="site-brand" href={normalizedBasePath}>
+      <span class="site-brand__mark">404</span>
+      <span aria-hidden="true" class="site-brand__divider">
+        /
+      </span>
+      <span>Job Not Found</span>
+    </a>
+
+    <div class="site-nav__links">
+      {links.map((link) => (
+        <a
+          aria-current={isCurrent(link.path) ? 'page' : undefined}
+          class="site-nav__link"
+          data-nav-path={link.path}
+          href={link.href}
+        >
+          {link.label}
+        </a>
+      ))}
+      <a
+        aria-label="LinkedIn profile (opens in a new tab)"
+        class="site-nav__social"
+        href="https://www.linkedin.com/in/nir-yahav/"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        in <span aria-hidden="true">↗</span>
+      </a>
+      <a
+        aria-label="GitHub profile (opens in a new tab)"
+        class="site-nav__social"
+        href="https://github.com/nyahav"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        GH <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+
+    <button
+      aria-controls="mobile-site-menu"
+      aria-expanded="false"
+      aria-label="פתיחת תפריט ניווט"
+      class="site-nav__toggle"
+      data-nav-toggle
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="site-nav__icon site-nav__icon--menu"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M4 7h16M4 12h16M4 17h16"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-width="1.8"
+        />
+      </svg>
+      <svg
+        aria-hidden="true"
+        class="site-nav__icon site-nav__icon--close"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="m6 6 12 12M18 6 6 18"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-width="1.8"
+        />
+      </svg>
+    </button>
+
+    <div class="site-nav__mobile" data-mobile-menu hidden id="mobile-site-menu">
+      {links.map((link) => (
+        <a
+          aria-current={isCurrent(link.path) ? 'page' : undefined}
+          class="site-nav__mobile-link"
+          data-nav-path={link.path}
+          href={link.href}
+        >
+          {link.label}
+        </a>
+      ))}
+    </div>
+  </nav>
+</header>
+
+<script>
+  const initializeNavbar = () => {
+    document.querySelectorAll<HTMLElement>('.site-header').forEach((header) => {
+      if (header.dataset.navInitialized === 'true') return;
+      header.dataset.navInitialized = 'true';
+
+      const toggle = header.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+      const menu = header.querySelector<HTMLElement>('[data-mobile-menu]');
+      if (!toggle || !menu) return;
+
+      const closeMenu = () => {
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.setAttribute('aria-label', 'פתיחת תפריט ניווט');
+        menu.hidden = true;
+      };
+
+      toggle.addEventListener('click', () => {
+        const isOpen = toggle.getAttribute('aria-expanded') === 'true';
+        toggle.setAttribute('aria-expanded', String(!isOpen));
+        toggle.setAttribute('aria-label', isOpen ? 'פתיחת תפריט ניווט' : 'סגירת תפריט ניווט');
+        menu.hidden = isOpen;
+      });
+
+      menu.addEventListener('click', (event) => {
+        if ((event.target as HTMLElement).closest('a')) closeMenu();
+      });
+
+      header.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          closeMenu();
+          toggle.focus();
+        }
+      });
+
+      const updateNavigation = () => {
+        header.querySelectorAll<HTMLAnchorElement>('[data-nav-path]').forEach((link) => {
+          const target = link.dataset.navPath;
+          const current = window.location.pathname.endsWith('/')
+            ? window.location.pathname
+            : `${window.location.pathname}/`;
+          if (!target) return;
+          const [targetPath, targetHash] = target.split('#');
+          const base = header.dataset.basePath;
+          const active = targetHash
+            ? current === targetPath && window.location.hash === `#${targetHash}`
+            : current === targetPath || (targetPath !== base && current.startsWith(targetPath));
+          if (active) link.setAttribute('aria-current', 'page');
+          else link.removeAttribute('aria-current');
+        });
+        closeMenu();
+      };
+
+      const updateScrolledState = () => {
+        header.dataset.scrolled = String(window.scrollY > 16);
+      };
+
+      document.addEventListener('astro:page-load', updateNavigation);
+      window.addEventListener('scroll', updateScrolledState, { passive: true });
+      updateScrolledState();
+    });
+  };
+
+  document.addEventListener('astro:page-load', initializeNavbar);
+  initializeNavbar();
+</script>
