@@ -55,7 +55,7 @@ export default function SiteNavbar({ basePath, currentPath }: SiteNavbarProps) {
       label: 'Database Explorer',
       path: `${basePath}database-explorer/`,
     },
-    { href: `${basePath}3-am/`, label: '3 AM Lab', path: `${basePath}3-am/` },
+    { href: `${basePath}3-am/`, label: '3AM Incident Lab', path: `${basePath}3-am/` },
     { href: `${basePath}#articles`, label: 'Articles', path: `${basePath}#articles` },
   ];
 
