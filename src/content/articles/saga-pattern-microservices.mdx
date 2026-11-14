@@ -1,0 +1,141 @@
+---
+title: 'Saga Pattern: איך שומרים על סדר כשהנתונים מפוזרים'
+description: 'מדריך מעשי ל-Saga Pattern במיקרו-שירותים: choreography מול orchestration, פעולות פיצוי, retries, עקביות ותפעול בפרודקשן.'
+pubDate: 2026-11-14
+updatedDate: 2026-11-14
+author: 'יהב ניר'
+authorBio: 'מהנדס תוכנה המתמחה במערכות מבוזרות, שירותי Backend ואמינות מערכות.'
+contentType: BlogPosting
+tags:
+  - microservices
+  - distributed-systems
+  - saga-pattern
+  - architecture
+---
+
+דמיינו הזמנה באתר מסחר. צריך לחייב כרטיס אשראי, לשריין מלאי ולהזמין משלוח. בארכיטקטורת מיקרו-שירותים כל אחד מהשלבים האלה חי בשירות אחר, עם מסד נתונים משלו. עכשיו נניח שהחיוב עבר והמלאי נגמר ברגע האחרון. אין טרנזקציה אחת שאפשר לעשות לה rollback, והכסף של הלקוח כבר יצא. הבעיה הזאת היא הסיבה שה-Saga Pattern קיים.
+
+הפתרון הקלאסי הוא Two-Phase Commit (2PC): מתאם מרכזי שואל את כל המשתתפים אם הם מוכנים, ורק כשכולם עונים כן הוא מורה להם לבצע commit. זה עובד היטב במערכת מונוליטית, אבל במיקרו-שירותים זה הופך לעול. השירותים נקשרים זה לזה דרך המתאם, שירות אחד שנופל עוצר את כל הפעולה, והנעילות שנשמרות לאורך כל התהליך פוגעות בביצועים. ככל שמתווספים עוד שירותים, המנגנון נעשה שביר יותר.
+
+ה-Saga Pattern מציע כיוון הפוך. במקום טרנזקציה אחת גדולה, מפרקים את הפעולה לרצף של טרנזקציות מקומיות. כל שירות מבצע את שלו, מפרסם אירוע, והאירוע מפעיל את הצעד הבא. אם משהו נכשל באמצע, מריצים Compensating transactions שמבטלות את מה שכבר נעשה. המחיר הוא שמוותרים על הבידוד של ACID ומקבלים במקומו זמינות וביצועים. המערכת לא עקבית בכל רגע נתון, אבל היא מתכנסת לעקביות — eventual consistency. הרעיון עצמו לא חדש: הוא תואר כבר ב-1987 במאמר של Hector Garcia-Molina ו-Kenneth Salem, והפך לרלוונטי במיוחד עם עליית המיקרו-שירותים.
+
+## שתי דרכים לתזמר Saga
+
+בדרך הראשונה, Choreography, אין מנהל. כל שירות מאזין לאירועים ומגיב להם, כמו רקדנים שיודעים את הכוריאוגרפיה בלי במאי. כך זה עשוי להיראות בשירות התשלומים כשהתשתית היא Kafka:
+
+```ts
+// Payment service: reacts to OrderCreated, emits its own outcome
+consumer.on("order-events", async (event) => {
+  if (event.type !== "OrderCreated") return;
+
+  try {
+    await gateway.charge(event.customerId, event.amount);
+    await producer.send("payment-events", {
+      type: "PaymentProcessed",
+      orderId: event.orderId,
+      sagaId: event.sagaId,
+    });
+  } catch (err) {
+    await producer.send("payment-events", {
+      type: "PaymentFailed",
+      orderId: event.orderId,
+      sagaId: event.sagaId,
+      reason: err.message,
+    });
+  }
+});
+```
+
+הגישה הזאת מנותקת ואלגנטית, אבל ככל שהזרימה מסתעפת, קשה יותר להבין מי מפעיל את מי. הדרך השנייה, Orchestration, מציבה במרכז מנהל אחד שמחזיק את מצב ה-Saga ואומר לכל שירות מה לעשות ומתי. יש בה יותר שליטה ונוחות בבדיקות, אבל גם נקודת כשל אפשרית וצימוד למנהל. אפשר לדמיין אותו בערך כך:
+
+```ts
+async function runOrderSaga(order: Order) {
+  const compensations: Array<() => Promise<void>> = [];
+
+  try {
+    await payment.charge(order.id);
+    compensations.push(() => payment.refund(order.id));
+
+    await inventory.reserve(order.id);
+    compensations.push(() => inventory.release(order.id));
+
+    await shipping.schedule(order.id);
+  } catch (err) {
+    // Undo in reverse order
+    for (const undo of compensations.reverse()) {
+      await undo();
+    }
+    throw err;
+  }
+}
+```
+
+שימו לב לפרט הקטן: את הפעולה המפצה רושמים רק אחרי שהצעד עצמו הצליח, ומריצים את הפעולות המפצות בסדר הפוך.
+
+## פעולות פיצוי הן פעולות עסקיות חדשות
+
+כאן מגיע החלק שמפתיע מתכנתים שרגילים ל-rollback. Compensating transaction לא מחזירה את מסד הנתונים למצבו הקודם, אלא מבטלת את האפקט העסקי. החזר כספי לא מוחק את החיוב המקורי. הוא יוצר פעולה חדשה שמאזנת אותו, וההיסטוריה נשארת.
+
+מכאן נגזרות שלוש דרישות. הפעולה המפצה חייבת להיות Idempotent, כי הודעות מגיעות לפעמים פעמיים וההחזר לא אמור לצאת כפול. היא חייבת לשקף את הכוונה העסקית ולא רק את המצב הטכני. ויש פעולות שאי אפשר לבטל בכלל, כמו מייל שכבר נשלח, ולכן את הצעדים הבלתי הפיכים כדאי לדחות לסוף, אחרי שכל הצעדים שעלולים להיכשל כבר עברו.
+
+```ts
+async function refund(orderId: string, compensationId: string) {
+  // Same compensationId arriving twice must not refund twice
+  const alreadyDone = await db.compensations.exists(compensationId);
+  if (alreadyDone) return;
+
+  await db.transaction(async (tx) => {
+    await payments.refund(orderId, { tx });
+    await tx.compensations.insert({ id: compensationId, orderId });
+  });
+}
+```
+
+## להתאושש מכשלים: retry או פיצוי
+
+גם לכישלון עצמו יש יותר מפנים אחד. כשהבעיה עסקית ולא תיפתר מעצמה, כמו מלאי שנגמר או כרטיס שנדחה, עושים backward recovery ומפעילים פיצוי. כשהבעיה זמנית, כמו תקלת רשת רגעית, עדיף forward recovery, כלומר לנסות שוב. בפרקטיקה משלבים בין השניים: ניסיונות חוזרים עם backoff מעריכי, ופיצוי רק אם הניסיונות נגמרו או שהתברר שהכשל קבוע. כלים כמו Temporal מטפלים בכך:
+
+```ts
+const activities = proxyActivities<typeof acts>({
+  startToCloseTimeout: "5 minutes",
+  retry: {
+    maximumAttempts: 3,
+    backoffCoefficient: 2,
+  },
+});
+// Retries happen automatically; the catch block that runs
+// compensations only fires once all attempts are exhausted.
+```
+
+מי שמחפש מנוע מוכן לתזמור ימצא גם את Camunda 8 עם דיאגרמות BPMN, את Dapr Workflows ואת AWS Step Functions. הבחירה תלויה בתשתית ובהעדפות הצוות — קוד מול עיצוב ויזואלי.
+
+## עקביות ביניים ו-Semantic Lock
+
+המחיר האמיתי של Saga הוא בידוד. כשהכול קורה בשלבים, מצבי ביניים גלויים לכל מי שמסתכל. לקוח אחר עלול לראות "מלאי נמוך" בגלל שריון זמני שיתבטל עוד רגע. אחת הדרכים להתמודד היא Semantic Lock: מסמנים את הישות כ"בתהליך" כדי שאחרים ידעו לא לגעת בה.
+
+```ts
+// Saga starts: the order is visible, but marked as unfinished
+await orders.update(orderId, { status: "PENDING" });
+
+// Other flows respect the marker
+if (order.status === "PENDING") {
+  return; // a saga is still working on this order
+}
+
+// Saga ends successfully
+await orders.update(orderId, { status: "CONFIRMED" });
+```
+
+עוד כלים בארגז: מספרי גרסה לזיהוי התנגשויות בין Sagas שנוגעות באותם נתונים, ופעולות קומוטטיביות שהסדר שלהן לא משנה, כמו "הוסף 10 לחשבון" ו"הוסף 5 לחשבון".
+
+## תפעול Saga בפרודקשן
+
+בפרודקשן מתחילים הדברים הקטנים והחשובים. אם צריך לעדכן מסד נתונים ולפרסם אירוע באותה פעולה, משתמשים ב-Outbox Pattern כדי לא ליפול ל-dual write. לכל צעד קובעים timeout, כי Saga לא יכולה לחכות לנצח.
+
+בכל אירוע ובכל שורת לוג מטמיעים correlation ID, ובעזרת distributed tracing אפשר לעקוב אחרי Saga אחת לאורך כל השירותים. כשהיא נתקעת, בודקים קודם כול lag של ה-consumers, הגדרות timeout ו-poison messages שחוסמים את התור. כשהיא מסתיימת בהצלחה אבל הנתונים לא נראים נכון, החשודים הרגילים הם race conditions, קריאה מ-replica מיושן וסדר אירועים שהשתבש.
+
+ובדיקות? כדאי לשאול את עצמכם מה קורה כשצעד 3 מתוך 5 נופל, ולדמות את זה בפועל.
+
+## מתי כדאי להשתמש ב-Saga?
+
+לא תמיד. פעולה שנשארת בתוך שירות אחד צריכה להישאר טרנזקציית ACID רגילה. Saga מיועדת לתהליכים עסקיים שחוצים גבולות של שירותים. אפשר להתחיל ב-Choreography בזרימות פשוטות וקצרות, ולעבור ל-Orchestration כשמתחילים לראות הסתעפויות, צורך בשליטה מרוכזת ב-timeouts או קושי לעקוב אחרי מה שקורה.
