@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import ArticleCarousel from '../../components/site/ArticleCarousel';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 
 const articles = (await getCollection('articles', ({ data }) => !data.draft))
@@ -29,22 +30,25 @@ const basePath = import.meta.env.BASE_URL.endsWith('/')
       <h1>מאמרים ורעיונות</h1>
       <p>מחשבות, מדריכים ותובנות על תוכנה והאינטרנט.</p>
     </header>
-    <ol class="articles-list">
-      {articles.map((article) => (
-        <li class="articles-list__item">
-          <a href={`${basePath}articles/${article.slug}/`}>
-            <time datetime={article.pubDate} dir="ltr">
-              {new Date(article.pubDate).toLocaleDateString('he-IL', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </time>
-            <h2>{article.title}</h2>
-            <p>{article.description}</p>
-          </a>
-        </li>
-      ))}
-    </ol>
+    <ArticleCarousel articles={articles} basePath={basePath} client:load />
+    <noscript>
+      <ol class="articles-list">
+        {articles.map((article) => (
+          <li class="articles-list__item">
+            <a href={`${basePath}articles/${article.slug}/`}>
+              <time datetime={article.pubDate} dir="ltr">
+                {new Date(article.pubDate).toLocaleDateString('he-IL', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </time>
+              <h2>{article.title}</h2>
+              <p>{article.description}</p>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </noscript>
   </div>
 </SiteLayout>
