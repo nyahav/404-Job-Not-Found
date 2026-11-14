@@ -6,9 +6,14 @@ interface Props {
   dir?: 'ltr' | 'rtl';
   wide?: boolean;
   theme?: 'default' | 'alpine';
+  ogType?: 'website' | 'article' | 'profile';
+  noIndex?: boolean;
 }
 
+import { getImage } from 'astro:assets';
 import { ClientRouter } from 'astro:transitions';
+import JsonLd from '../components/site/JsonLd.astro';
+import seceda from '../assets/mountains/seceda.jpg';
 import '../styles/global.css';
 import SiteFooter from '../components/site/SiteFooter.astro';
 import SiteNavbar from '../components/site/SiteNavbar.astro';
@@ -20,10 +25,56 @@ const {
   dir = 'ltr',
   wide = false,
   theme = 'default',
+  ogType = 'website',
+  noIndex = false,
 } = Astro.props;
 const basePath = import.meta.env.BASE_URL.endsWith('/')
   ? import.meta.env.BASE_URL
   : `${import.meta.env.BASE_URL}/`;
+const siteBase = new URL(basePath, Astro.site);
+const routePath = Astro.url.pathname.startsWith(basePath)
+  ? Astro.url.pathname.slice(basePath.length)
+  : Astro.url.pathname.replace(/^\/+/, '');
+const canonicalUrl = new URL(routePath, siteBase).toString();
+const socialImage = await getImage({
+  src: seceda,
+  width: 1200,
+  height: 630,
+  fit: 'cover',
+  format: 'webp',
+});
+const socialImageUrl = new URL(socialImage.src, Astro.site).toString();
+const siteUrl = siteBase.toString();
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${siteUrl}#website`,
+      url: siteUrl,
+      name: '404 - Job Not Found',
+      inLanguage: ['en', 'he'],
+      publisher: { '@id': `${siteUrl}#organization` },
+    },
+    {
+      '@type': 'Organization',
+      '@id': `${siteUrl}#organization`,
+      name: '404 - Job Not Found',
+      url: siteUrl,
+      sameAs: ['https://github.com/nyahav'],
+    },
+    {
+      '@type': 'Person',
+      '@id': `${siteUrl}#yahav-nir`,
+      name: 'יהב ניר',
+      alternateName: 'Yahav Nir',
+      jobTitle: 'מהנדס תוכנה',
+      description: 'מהנדס תוכנה המתמחה במערכות מבוזרות, שירותי Backend ואמינות מערכות.',
+      url: new URL('about/', siteBase).toString(),
+      sameAs: ['https://www.linkedin.com/in/nir-yahav/', 'https://github.com/nyahav'],
+    },
+  ],
+};
 ---
 
 <!doctype html>
@@ -33,6 +84,30 @@ const basePath = import.meta.env.BASE_URL.endsWith('/')
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
+    {!noIndex && <link rel="canonical" href={canonicalUrl} />}
+    {noIndex && <meta name="robots" content="noindex, nofollow" />}
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content="404 - Job Not Found" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {!noIndex && <meta property="og:url" content={canonicalUrl} />}
+    <meta property="og:image" content={socialImageUrl} />
+    <meta property="og:image:alt" content="Sunrise over Seceda in the Dolomites" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageUrl} />
+    <meta name="twitter:image:alt" content="Sunrise over Seceda in the Dolomites" />
+    {import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION && (
+      <meta
+        name="google-site-verification"
+        content={import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION}
+      />
+    )}
+    {import.meta.env.PUBLIC_BING_SITE_VERIFICATION && (
+      <meta name="msvalidate.01" content={import.meta.env.PUBLIC_BING_SITE_VERIFICATION} />
+    )}
+    <JsonLd data={websiteSchema} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

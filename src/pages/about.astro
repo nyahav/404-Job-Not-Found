@@ -1,23 +1,15 @@
 ---
-import { getImage } from 'astro:assets';
+import JsonLd from '../components/site/JsonLd.astro';
 import AscentAbout from '../components/site/AscentAbout.astro';
 import SiteLayout from '../layouts/SiteLayout.astro';
-import seceda from '../assets/mountains/seceda.jpg';
 
 const description =
   'הכירו את יהב ניר, מהנדס תוכנה המתמחה במערכות מבוזרות, שירותי Backend ואמינות מערכות.';
-const basePath = import.meta.env.BASE_URL.endsWith('/')
-  ? import.meta.env.BASE_URL
-  : `${import.meta.env.BASE_URL}/`;
-const siteBase = new URL(basePath, Astro.site);
-const canonicalUrl = new URL('about/', siteBase).toString();
-const socialImage = await getImage({ src: seceda, width: 1200, format: 'webp' });
-const socialImageUrl = new URL(socialImage.src, Astro.site).toString();
 const structuredData = {
   '@context': 'https://schema.org',
   '@type': 'ProfilePage',
   name: 'אודות | יהב ניר',
-  url: canonicalUrl,
+  url: new URL('about/', new URL(import.meta.env.BASE_URL, Astro.site)).toString(),
   mainEntity: {
     '@type': 'Person',
     name: 'יהב ניר',
@@ -38,14 +30,7 @@ const structuredData = {
   theme="alpine"
 >
   <Fragment slot="head">
-    <link rel="canonical" href={canonicalUrl} />
-    <meta property="og:type" content="profile" />
-    <meta property="og:title" content="יהב ניר — מהנדס תוכנה" />
-    <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:image" content={socialImageUrl} />
-    <meta name="twitter:card" content="summary_large_image" />
-    <script type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+    <JsonLd data={structuredData} />
   </Fragment>
   <AscentAbout />
 </SiteLayout>

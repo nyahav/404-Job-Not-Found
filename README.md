@@ -48,6 +48,26 @@ so make sure everything in the working tree is intended for publication. It
 uses Node.js 22.23.4 or newer from `PATH`, or finds a supported Node.js runtime
 in the local npm cache. GitHub Actions deploys the site after the push.
 
+## Search indexing and SEO
+
+The static build publishes `robots.txt`, `sitemap.xml`, canonical URLs, social
+metadata, and JSON-LD. Article pages are generated as HTML, and the articles
+index contains ordinary server-rendered links. Add and publish content under
+`src/content/articles/`; set `draft: true` to exclude an article from routes,
+the index, and the sitemap.
+
+To connect search tools:
+
+1. Add the site property `https://nyahav.github.io/404-Job-Not-Found/` in
+   Google Search Console and Bing Webmaster Tools.
+2. Copy each service's HTML meta verification value into the GitHub repository
+   Actions variables `PUBLIC_GOOGLE_SITE_VERIFICATION` and
+   `PUBLIC_BING_SITE_VERIFICATION`, then deploy again.
+3. Submit
+   `https://nyahav.github.io/404-Job-Not-Found/sitemap.xml` to both services.
+4. Review indexing, crawl errors, and Core Web Vitals in Search Console and
+   Bing Webmaster Tools after verification and periodically after publishing.
+
 ```powershell
 .\scripts\publish-site.ps1
 ```

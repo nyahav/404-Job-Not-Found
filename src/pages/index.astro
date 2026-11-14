@@ -5,7 +5,7 @@ import FeatureBento from '../components/site/FeatureBento';
 import HomeHero from '../components/site/HomeHero';
 import SiteLayout from '../layouts/SiteLayout.astro';
 
-const articles = (await getCollection('articles'))
+const articles = (await getCollection('articles', ({ data }) => !data.draft))
   .sort((first, second) => second.data.pubDate.valueOf() - first.data.pubDate.valueOf())
   .map((article) => ({
     slug: article.id.replace(/\.(md|mdx)$/, ''),

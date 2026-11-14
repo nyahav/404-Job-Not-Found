@@ -1,15 +1,15 @@
 ---
 import { getCollection } from 'astro:content';
-import ArticleCarousel from '../../components/site/ArticleCarousel';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 
-const articles = (await getCollection('articles'))
+const articles = (await getCollection('articles', ({ data }) => !data.draft))
   .sort((first, second) => second.data.pubDate.valueOf() - first.data.pubDate.valueOf())
   .map((article) => ({
     slug: article.id.replace(/\.(md|mdx)$/, ''),
     title: article.data.title,
     description: article.data.description,
     pubDate: article.data.pubDate.toISOString(),
+    updatedDate: article.data.updatedDate.toISOString(),
   }));
 const basePath = import.meta.env.BASE_URL.endsWith('/')
   ? import.meta.env.BASE_URL
@@ -17,8 +17,8 @@ const basePath = import.meta.env.BASE_URL.endsWith('/')
 ---
 
 <SiteLayout
-  title="Articles | 404 - Job Not Found"
-  description="מאמרים על תוכנה, מערכות והאינטרנט."
+  title="מאמרים על תוכנה, מערכות והאינטרנט | 404 - Job Not Found"
+  description="מאמרים ומדריכים מקוריים על פיתוח תוכנה, מערכות מבוזרות, מסדי נתונים והאינטרנט."
   lang="he"
   dir="rtl"
   wide
@@ -29,6 +29,22 @@ const basePath = import.meta.env.BASE_URL.endsWith('/')
       <h1>מאמרים ורעיונות</h1>
       <p>מחשבות, מדריכים ותובנות על תוכנה והאינטרנט.</p>
     </header>
-    <ArticleCarousel articles={articles} basePath={basePath} client:load />
+    <ol class="articles-list">
+      {articles.map((article) => (
+        <li class="articles-list__item">
+          <a href={`${basePath}articles/${article.slug}/`}>
+            <time datetime={article.pubDate} dir="ltr">
+              {new Date(article.pubDate).toLocaleDateString('he-IL', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </time>
+            <h2>{article.title}</h2>
+            <p>{article.description}</p>
+          </a>
+        </li>
+      ))}
+    </ol>
   </div>
 </SiteLayout>

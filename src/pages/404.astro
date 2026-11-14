@@ -1,0 +1,20 @@
+---
+import SiteLayout from '../layouts/SiteLayout.astro';
+---
+
+<SiteLayout
+  title="Page not found | 404 - Job Not Found"
+  description="The page you requested could not be found. Browse articles and interactive projects."
+  noIndex
+>
+  <section class="mx-auto max-w-2xl py-16 text-center" aria-labelledby="not-found-title">
+    <p class="eyebrow-token">404 / Not found</p>
+    <h1 class="mt-4 text-4xl font-bold" id="not-found-title">
+      This page could not be found.
+    </h1>
+    <p class="mt-4 text-secondary">The link may be outdated, or the page may have moved.</p>
+    <a class="articles-section__link mt-6" href={import.meta.env.BASE_URL}>
+      Return to the homepage
+    </a>
+  </section>
+</SiteLayout>
