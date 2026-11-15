@@ -12,7 +12,7 @@ export default function ArticleBento({ articles, basePath }: ArticleBentoProps) 
   return (
     <div className="feature-grid feature-grid--articles" dir="rtl">
       {cards.map((item, index) => (
-        <ShowcaseCard basePath={basePath} index={index} item={item} key={item.id} />
+        <ShowcaseCard basePath={basePath} index={index} item={item} key={item.id} spotlight />
       ))}
     </div>
   );

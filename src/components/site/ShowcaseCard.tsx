@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpLeft, ArrowUpRight } from 'lucide-react';
+import type { PointerEvent as ReactPointerEvent } from 'react';
 import Reveal from './Reveal';
 import { MOTION_DURATION, MOTION_EASE } from './motion';
 import type { ShowcaseCardItem } from './articleCards';
@@ -9,6 +10,7 @@ interface ShowcaseCardProps {
   index: number;
   item: ShowcaseCardItem;
   size?: 'standard' | 'carousel';
+  spotlight?: boolean;
 }
 
 export default function ShowcaseCard({
@@ -16,6 +18,7 @@ export default function ShowcaseCard({
   index,
   item,
   size = 'standard',
+  spotlight = false,
 }: ShowcaseCardProps) {
   const reduceMotion = useReducedMotion();
   const isArticle = item.layout === 'article';
@@ -26,6 +29,7 @@ export default function ShowcaseCard({
     'feature-card',
     isArticle && 'feature-card--article',
     isArticle && size === 'carousel' && 'feature-card--carousel',
+    spotlight && 'feature-card--spotlight',
   ]
     .filter(Boolean)
     .join(' ');
@@ -39,6 +43,26 @@ export default function ShowcaseCard({
     whileHover: reduceMotion ? undefined : { y: -4 },
     whileTap: reduceMotion ? undefined : { scale: 0.99 },
   };
+  const trackSpotlight = (event: ReactPointerEvent<HTMLElement>) => {
+    if (!spotlight || (event.pointerType !== 'mouse' && event.pointerType !== 'pen')) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    event.currentTarget.style.setProperty(
+      '--spot-x',
+      `${((event.clientX - bounds.left) / bounds.width) * 100}%`,
+    );
+    event.currentTarget.style.setProperty(
+      '--spot-y',
+      `${((event.clientY - bounds.top) / bounds.height) * 100}%`,
+    );
+  };
+  const resetSpotlight = (event: ReactPointerEvent<HTMLElement>) => {
+    if (!spotlight) return;
+    event.currentTarget.style.setProperty('--spot-x', '50%');
+    event.currentTarget.style.setProperty('--spot-y', '50%');
+  };
+  const spotlightProps = spotlight
+    ? { onPointerMove: trackSpotlight, onPointerLeave: resetSpotlight }
+    : {};
 
   const content =
     item.layout === 'feature' ? (
@@ -87,15 +111,17 @@ export default function ShowcaseCard({
   return (
     <Reveal className="feature-card-reveal" delay={index * 0.06}>
       {href ? (
-        <motion.a {...motionProps} href={href}>
+        <motion.a {...motionProps} {...spotlightProps} href={href}>
           {content}
         </motion.a>
       ) : articleHref ? (
-        <motion.a {...motionProps} href={articleHref} style={transitionStyle}>
+        <motion.a {...motionProps} {...spotlightProps} href={articleHref} style={transitionStyle}>
           {content}
         </motion.a>
       ) : (
-        <motion.article {...motionProps}>{content}</motion.article>
+        <motion.article {...motionProps} {...spotlightProps}>
+          {content}
+        </motion.article>
       )}
     </Reveal>
   );

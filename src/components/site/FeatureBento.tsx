@@ -40,7 +40,7 @@ export default function FeatureBento({ basePath }: FeatureBentoProps) {
   return (
     <div className="feature-grid">
       {items.map((item, index) => (
-        <ShowcaseCard basePath={basePath} index={index} item={item} key={item.href} />
+        <ShowcaseCard basePath={basePath} index={index} item={item} key={item.href} spotlight />
       ))}
     </div>
   );
